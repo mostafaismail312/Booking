@@ -79,17 +79,17 @@ export default function ResetPass() {
                   <Grid direction="column" spacing={2}>
                     <Grid>
                       <Typography>Email</Typography>
-                      <TextField fullWidth variant="filled" />
+                      <TextField id='email' fullWidth variant="filled" {...register('email')}/>
                     </Grid>
 
                     <Grid>
                       <Typography>OTP</Typography>
-                      <TextField fullWidth variant="filled" />
+                      <TextField id='seed' fullWidth variant="filled" {...register('seed')}/>
                     </Grid>
 
                     <Grid>
                       <Typography>Password</Typography>
-                      <TextField
+                      <TextField id='password' {...register('password')}
                         fullWidth
                         variant="filled"
                         type={showPassword ? 'text' : 'password'}
@@ -111,7 +111,7 @@ export default function ResetPass() {
                     {/* Confirm Password */}
                     <Grid sx={{ mt: 2 }}>
                       <Typography>Confirm Password</Typography>
-                      <TextField
+                      <TextField id='confirmPassword' {...register('confirmPassword')}
                         fullWidth
                         variant="filled"
                         type={showConfirm ? 'text' : 'password'}
@@ -136,7 +136,7 @@ export default function ResetPass() {
 
 
               <Grid sx={{ mt:'10px'}}>
-                <Button fullWidth variant="contained">Get Started</Button>
+                <Button fullWidth variant="contained">Reset</Button>
               </Grid>
                </Box>
             </Grid>
