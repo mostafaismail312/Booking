@@ -46,17 +46,8 @@ export default function ResetPass() {
      
       console.log("ana", response.data.data);
       navigate(LOGIN_PATH)
-
-      // if (response?.data.data?.user.role != "user") {
-      //   navigate(DASHBOARD_PATH);
-      // } else {
-      //   navigate("/");
-      // }
-
-      //saveLoginData();
-      // await saveLoginData();
-      // await getCurrentUser();
-      toast.success("Login success!");
+      toast.success(" success!");
+      navigate(LOGIN_PATH)
     } catch (error) {
       // console.log(error?.response?.data?.message);
       if (isAxiosError(error)) {
