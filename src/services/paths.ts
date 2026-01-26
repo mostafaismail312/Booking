@@ -5,6 +5,7 @@ export const REGISTER_PATH = `${MAIN_PATH}register`;
 export const FORGET_PASS_PATH = `${MAIN_PATH}forget-pass`;
 export const RESET_PASS_PATH = `${MAIN_PATH}reset-pass`;
 export const VERIFY_ACCOUNT_PATH = `${MAIN_PATH}verify-account`;
+export const CHANGE_PASS_PATH_PATH = `${MAIN_PATH}verify-account`;
 
 // ------------------ Main Layout Routes ------------------
 export const HOME_PATH = MAIN_PATH;
