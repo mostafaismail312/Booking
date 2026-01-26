@@ -118,7 +118,7 @@ export default function ResetPass() {
                     }}
                     id="outlined-adornment-email"
                     type={"text"}
-                    placeholder="please type here"
+                    placeholder=" Email Address"
                     {...register("email", validation.EMAIL_VALIDATION)}
                   />
                 </FormControl>

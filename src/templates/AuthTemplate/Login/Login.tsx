@@ -109,7 +109,7 @@ export default function Login() {
                       background: "#f5f6f8",
                     }}
                     id="outlined-adornment-email"
-                    type={"text"}
+                    type={"email"}
                     placeholder="Enter your Email"
                     {...register("email", validation.EMAIL_VALIDATION)}
                   />

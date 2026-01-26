@@ -15,7 +15,7 @@ import Logo from "../../../components/AuthComponents/Logo/Logo";
 import { DASHBOARD_PATH, FORGET_PASS_PATH } from "../../../services/paths";
 import validation from "../../../services/validation";
 import SubmitBtn from "../../../layouts/AuthLayout/submitBtn";
-import type { LoginProps } from "../../../interfaces/Auth";
+import type { ChangePasswordProps } from "../../../interfaces/Auth";
 import AuhtHeader from "../../../components/AuthComponents/AuhtHeader/AuhtHeader";
 import { useAuth } from "../../../context/AuthContext/AuthContext";
 import RightSideImage from "../../../components/AuthComponents/RightSideImage/RightSideImage";
@@ -30,14 +30,14 @@ export default function ChangePassword() {
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
-  } = useForm<LoginProps>();
-  const { saveLoginData, ChangePasswor } = useAuth();
+  } = useForm<ChangePasswordProps>();
+ 
 
   // =========== submit login ========
   const onSubmit = async (data: ChangePasswordProps) => {
     try {
       const response = await axiosInstance.post(ADMIN_URLS.USER.CHANGE_PASSWORD, data);
-      localStorage.setItem("token", response?.data.data.token);
+    
       console.log("ana", response.data.data);
 
       if (response?.data.data?.user.role != "user") {
@@ -46,12 +46,9 @@ export default function ChangePassword() {
         navigate("/");
       }
 
-      saveLoginData();
-      // await saveLoginData();
-      // await getCurrentUser();
+   
       toast.success("Login success!");
     } catch (error) {
-      // console.log(error?.response?.data?.message);
       if (isAxiosError(error)) {
         toast.error(error?.response?.data?.message || "Something went wrong");
       }
@@ -72,54 +69,13 @@ export default function ChangePassword() {
           <Container maxWidth="sm">
             <Logo />
             <AuhtHeader
-              header={"Sign in"}
-              message={"If you don’t have an account register You can"}
-              linkName={"Register here!"}
-              link={"/register"}
+              header={"Change Password"}
+              message={""}
+              linkName={""}
+              link={""}
             />
             <Box component="form" onSubmit={handleSubmit(onSubmit)}>
-              <Box
-                sx={{
-                  mt: "1.5rem",
-                }}
-              >
-                <InputLabel
-                  sx={{
-                    color: "var(--dark-blue-color)",
-                    fontWeight: "400",
-                    fontSize: "16px",
-                  }}
-                >
-                  Email Address
-                </InputLabel>
-                <FormControl
-                  fullWidth
-                  sx={{
-                    margin: { top: ".3rem", bottom: "35px" },
-                    // "& .MuiOutlinedInput-root": {
-                    //   "& fieldset": {
-                    //     border: "none",
-                    //   },
-                    // },
-                  }}
-                  variant="standard"
-                >
-                  <OutlinedInput
-                    sx={{
-                      background: "#f5f6f8",
-                    }}
-                    id="outlined-adornment-email"
-                    type={"text"}
-                    placeholder="Enter your Email"
-                    {...register("email", validation.EMAIL_VALIDATION)}
-                  />
-                </FormControl>
-                {errors.email && (
-                  <Alert sx={{ marginBottom: "1rem" }} severity="error">
-                    {errors.email.message}
-                  </Alert>
-                )}
-              </Box>
+            
               {/* =============== password ========================== */}
 
               <Box
@@ -134,7 +90,117 @@ export default function ChangePassword() {
                     fontSize: "16px",
                   }}
                 >
-                  Password
+                old Password
+                </InputLabel>
+                <FormControl
+                  fullWidth
+                  sx={{
+                    mt: ".3rem",
+                  }}
+                  variant="standard"
+                >
+                  <OutlinedInput
+                    sx={{
+                      background: "#f5f6f8",
+                    }}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your old Password"
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label={
+                            showPassword
+                              ? "hide the password"
+                              : "display the password"
+                          }
+                          onClick={handleTogglePassword}
+                          onMouseDown={(e) => e.preventDefault()}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    {...register(
+                      "oldPassword",
+                      // validation.PASSWORD_VALIDATION("your password is requird")
+                    )}
+                  />
+                </FormControl>
+                {errors.oldPassword&& (
+                  <Alert sx={{ marginBottom: "1rem" }} severity="error">
+                    {errors.oldPassword.message}
+                  </Alert>
+                )}
+              </Box>
+                <Box
+                sx={{
+                  mt: "1.5rem",
+                }}
+              >
+                <InputLabel
+                  sx={{
+                    color: "var(--dark-blue-color)",
+                    fontWeight: "400",
+                    fontSize: "16px",
+                  }}
+                >
+                  New Password
+                </InputLabel>
+                <FormControl
+                  fullWidth
+                  sx={{
+                    mt: ".3rem",
+                  }}
+                  variant="standard"
+                >
+                  <OutlinedInput
+                    sx={{
+                      background: "#f5f6f8",
+                    }}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your New Password"
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label={
+                            showPassword
+                              ? "hide the password"
+                              : "display the password"
+                          }
+                          onClick={handleTogglePassword}
+                          onMouseDown={(e) => e.preventDefault()}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    {...register(
+                      "newPassword",
+                      // validation.PASSWORD_VALIDATION("your password is requird")
+                    )}
+                  />
+                </FormControl>
+                {errors.newPassword && (
+                  <Alert sx={{ marginBottom: "1rem" }} severity="error">
+                    {errors.newPassword.message}
+                  </Alert>
+                )}
+              </Box>
+                <Box
+                sx={{
+                  mt: "1.5rem",
+                }}
+              >
+                <InputLabel
+                  sx={{
+                    color: "var(--dark-blue-color)",
+                    fontWeight: "400",
+                    fontSize: "16px",
+                  }}
+                >
+                  Confirm Password
                 </InputLabel>
                 <FormControl
                   fullWidth
@@ -166,14 +232,14 @@ export default function ChangePassword() {
                       </InputAdornment>
                     }
                     {...register(
-                      "password",
+                      "confirmPassword",
                       // validation.PASSWORD_VALIDATION("your password is requird")
                     )}
                   />
                 </FormControl>
-                {errors.password && (
+                {errors.confirmPassword && (
                   <Alert sx={{ marginBottom: "1rem" }} severity="error">
-                    {errors.password.message}
+                    {errors.confirmPassword.message}
                   </Alert>
                 )}
               </Box>
@@ -192,7 +258,7 @@ export default function ChangePassword() {
                 </Link>
               </Box>
 
-              <SubmitBtn isSubmitting={isSubmitting} title="Login" />
+              <SubmitBtn isSubmitting={isSubmitting} title="Change" />
             </Box>
           </Container>
         </Grid>
