@@ -1,165 +1,297 @@
-import * as React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import { styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
-import reset from '../../../assets/images/resetPassword.png'
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import React from 'react'
+import { Alert, Box, Container, Grid } from "@mui/material";
+import { FormControl, InputLabel, OutlinedInput } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import InputAdornment from "@mui/material/InputAdornment";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { axiosInstance } from "../../../services/axiosInstance";
+import { ADMIN_URLS, PORTAL_URLS } from "../../../services/apiEndpoints";
+import { isAxiosError } from "axios";
+import toast from "react-hot-toast";
+import Logo from "../../../components/AuthComponents/Logo/Logo";
+import { DASHBOARD_PATH, FORGET_PASS_PATH, LOGIN_PATH } from "../../../services/paths";
+import validation from "../../../services/validation";
+import SubmitBtn from "../../../layouts/AuthLayout/submitBtn";
+import type { LoginProps, ResetPasswordProps } from "../../../interfaces/Auth";
+import AuhtHeader from "../../../components/AuthComponents/AuhtHeader/AuhtHeader";
+import { useAuth } from "../../../context/AuthContext/AuthContext";
+import RightSideImage from "../../../components/AuthComponents/RightSideImage/RightSideImage";
+import img from "../../../assets/images/forget.jpg"
 
-import { useState } from 'react';
-import { IconButton,InputAdornment} from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: (theme.vars ?? theme).palette.text.secondary,
-  ...theme.applyStyles('dark', {
-    backgroundColor: '#1A2027',
-  }),
-}));
 
 export default function ResetPass() {
-
     const [showPassword, setShowPassword] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
+     const [showPasswordconfirm, setShowPasswordconfirm] = useState(false);
+    const handleTogglePassword = () => {
+      setShowPassword((prev) => !prev);
+    };
+      const handleTogglePasswordconfirm = () => {
+      setShowPasswordconfirm((prev) => !prev);
+    };
 
-  const onSubmit = async (data: any) => {}
+    const navigate = useNavigate();
   const {
     register,
-    formState: { errors },
-    watch,
     handleSubmit,
-  } = useForm();
+    formState: { isSubmitting, errors },
+  } = useForm<ResetPasswordProps>();
+
+
+  const onSubmit = async (data: ResetPasswordProps) => {
+    try {
+      const response = await axiosInstance.post(PORTAL_URLS.USER.RESET_PASSWORD, data);
+     
+      console.log("ana", response.data.data);
+      navigate(LOGIN_PATH)
+      toast.success(" success!");
+      navigate(LOGIN_PATH)
+    } catch (error) {
+      // console.log(error?.response?.data?.message);
+      if (isAxiosError(error)) {
+        toast.error(error?.response?.data?.message || "Something went wrong");
+      }
+    }
+  };
 
   return (
     <>
-      <React.Fragment>
-      <CssBaseline />
-      <Container maxWidth={false} sx={{  height: '100vh' }}>
-       <Box sx={{ flexGrow: 1 }}>
-          <Grid container spacing={1}>
-            <Grid size={6}>
-              <Typography variant="h4" gutterBottom sx={{ color: 'darkblue',m:'30px'}}>
-                <Typography component="span" variant="h4" sx={{ color: 'blue' }}>
-                  Stay
-                </Typography>
-                cation
-              </Typography>
-              <Grid>
-                <Typography variant="h4" sx={{ mt:'70px', ml:'90px',fontWeight: 'bold' }}>
-                  Reset Password
-                </Typography>
-              </Grid>
-
-              <Grid>
-                <Typography variant="h6" sx={{ mt:'20px', ml:'90px' }}>
-                  If you already have an account register
-                </Typography>
-                <Typography variant="h6" gutterBottom sx={{ color: 'darkred'}}>
-                  <Typography component="span" variant="h6" sx={{ color: 'black', ml:'90px'}}>
-                    You can 
-                  </Typography>
-                    Login here !
-                </Typography>
-              </Grid>
-
-               <Box
-                  component="form"
-                  onSubmit={handleSubmit(onSubmit)}
-                  sx={{ width: '70%', mx: 'auto' , ml:'90px' }}
-                >
-                  <Grid direction="column" spacing={2}>
-                    <Grid>
-                      <Typography>Email</Typography>
-                      <TextField id='email' fullWidth variant="filled" {...register('email')}/>
-                    </Grid>
-
-                    <Grid>
-                      <Typography>OTP</Typography>
-                      <TextField id='seed' fullWidth variant="filled" {...register('seed')}/>
-                    </Grid>
-
-                    <Grid>
-                      <Typography>Password</Typography>
-                      <TextField id='password' {...register('password')}
-                        fullWidth
-                        variant="filled"
-                        type={showPassword ? 'text' : 'password'}
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                onClick={() => setShowPassword(!showPassword)}
-                                edge="end"
-                              >
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-
-                    {/* Confirm Password */}
-                    <Grid sx={{ mt: 2 }}>
-                      <Typography>Confirm Password</Typography>
-                      <TextField id='confirmPassword' {...register('confirmPassword')}
-                        fullWidth
-                        variant="filled"
-                        type={showConfirm ? 'text' : 'password'}
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                onClick={() => setShowConfirm(!showPassword)}
-                                edge="end"
-                              >
-                                {showConfirm ? <VisibilityOff /> : <Visibility />}
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                  
-                  </Grid>
-               
-
-
-
-              <Grid sx={{ mt:'10px'}}>
-                <Button fullWidth variant="contained">Reset</Button>
-              </Grid>
-               </Box>
-            </Grid>
-            
-            <Grid size={6}>
-              
+     <Grid container height={"100vh"}>
+        {/* Left Side: Form */}
+        <Grid
+          size={{ xs: 12, md: 6 }}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            px: 4,
+          }}
+        >
+          <Container maxWidth="sm">
+            <Logo />
+            <AuhtHeader
+              header={"Reset Password"}
+              message={"If you don’t have an account register You can"}
+              linkName={"Login here!"}
+              link={"/login"}
+            />
+            <Box component="form" onSubmit={handleSubmit(onSubmit)}>
               <Box
-                component="img"
                 sx={{
-                  width: {
-                    height:'90%', // width on extra-small screens
-                     width: '90%', // width on medium screens and up
-                  },
+                  mt: "1.5rem",
                 }}
-                alt="The house from the offer."
-                src={reset}
-              />
-            </Grid>
-            
-          </Grid>
-        </Box>
-      </Container>
-    </React.Fragment>
+              >
+                <InputLabel
+                  sx={{
+                    color: "var(--dark-blue-color)",
+                    fontWeight: "400",
+                    fontSize: "16px",
+                  }}
+                >
+                  Email 
+                </InputLabel>
+                <FormControl
+                  fullWidth
+                  sx={{
+                    margin: { top: ".3rem", bottom: "35px" },
+                    // "& .MuiOutlinedInput-root": {
+                    //   "& fieldset": {
+                    //     border: "none",
+                    //   },
+                    // },
+                  }}
+                  variant="standard"
+                >
+                  <OutlinedInput
+                    sx={{
+                      background: "#f5f6f8",
+                    }}
+                    id="outlined-adornment-email"
+                    type={"text"}
+                    placeholder=" Email Address"
+                    {...register("email", validation.EMAIL_VALIDATION)}
+                  />
+                </FormControl>
+                {errors.email && (
+                  <Alert sx={{ marginBottom: "1rem" }} severity="error">
+                    {errors.email.message}
+                  </Alert>
+                )}
+              </Box>
+                            {/* =============== otp ========================== */}
+                             <Box
+                sx={{
+                  mt: "1.5rem",
+                }}
+              >
+                <InputLabel
+                  sx={{
+                    color: "var(--dark-blue-color)",
+                    fontWeight: "400",
+                    fontSize: "16px",
+                  }}
+                >
+                  OTP
+                </InputLabel>
+                <FormControl
+                  fullWidth
+                  sx={{
+                    margin: { top: ".3rem", bottom: "35px" },
+                    // "& .MuiOutlinedInput-root": {
+                    //   "& fieldset": {
+                    //     border: "none",
+                    //   },
+                    // },
+                  }}
+                  variant="standard"
+                >
+                  <OutlinedInput
+                    sx={{
+                      background: "#f5f6f8",
+                    }}
+                    id="outlined-adornment-email"
+                    type={"text"}
+                    placeholder="please type here"
+                    {...register("seed", validation.OTP_VALIDATION)}
+                  />
+                </FormControl>
+                {errors.email && (
+                  <Alert sx={{ marginBottom: "1rem" }} severity="error">
+                    {errors.email.message}
+                  </Alert>
+                )}
+              </Box>
+
+              {/* =============== password ========================== */}
+               <Box
+                              sx={{
+                                mt: "1.5rem",
+                              }}
+                            >
+                              <InputLabel
+                                sx={{
+                                  color: "var(--dark-blue-color)",
+                                  fontWeight: "400",
+                                  fontSize: "16px",
+                                }}
+                              >
+                                Password
+                              </InputLabel>
+                              <FormControl
+                                fullWidth
+                                sx={{
+                                  mt: ".3rem",
+                                }}
+                                variant="standard"
+                              >
+                                <OutlinedInput
+                                  sx={{
+                                    background: "#f5f6f8",
+                                  }}
+                                  type={showPassword ? "text" : "password"}
+                                  placeholder="Enter your Password"
+                                  endAdornment={
+                                    <InputAdornment position="end">
+                                      <IconButton
+                                        aria-label={
+                                          showPassword
+                                            ? "hide the password"
+                                            : "display the password"
+                                        }
+                                        onClick={handleTogglePassword}
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        edge="end"
+                                      >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                      </IconButton>
+                                    </InputAdornment>
+                                  }
+                                  {...register(
+                                    "password",
+                                    // validation.PASSWORD_VALIDATION("your password is requird")
+                                  )}
+                                />
+                              </FormControl>
+                              {errors.password && (
+                                <Alert sx={{ marginBottom: "1rem" }} severity="error">
+                                  {errors.password.message}
+                                </Alert>
+                              )}
+                            </Box>
+
+                          {/* =============== confirm password ========================== */}
+  <Box
+                              sx={{
+                                mt: "1.5rem",
+                              }}
+                            >
+                              <InputLabel
+                                sx={{
+                                  color: "var(--dark-blue-color)",
+                                  fontWeight: "400",
+                                  fontSize: "16px",
+                                }}
+                              >
+                               confirm Password
+                              </InputLabel>
+                              <FormControl
+                                fullWidth
+                                sx={{
+                                  mt: ".3rem",
+                                }}
+                                variant="standard"
+                              >
+                                <OutlinedInput
+                                  sx={{
+                                    background: "#f5f6f8",
+                                  }}
+                                  type={showPasswordconfirm ? "text" : "password"}
+                                  placeholder="confirm Password"
+                                  endAdornment={
+                                    <InputAdornment position="end">
+                                      <IconButton
+                                        aria-label={
+                                          showPasswordconfirm
+                                            ? "hide the password"
+                                            : "display the password"
+                                        }
+                                        onClick={handleTogglePasswordconfirm}
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        edge="end"
+                                      >
+                                        {showPasswordconfirm ? <VisibilityOff /> : <Visibility />}
+                                      </IconButton>
+                                    </InputAdornment>
+                                  }
+                                  {...register(
+                                    "confirmPassword",
+                                    // validation.PASSWORD_VALIDATION("your password is requird")
+                                  )}
+                                />
+                              </FormControl>
+                              {errors.password && (
+                                <Alert sx={{ marginBottom: "1rem" }} severity="error">
+                                  {errors.password.message}
+                                </Alert>
+                              )}
+                            </Box>
+
+             
+
+              <SubmitBtn isSubmitting={isSubmitting} title="Send E-mail" />
+            </Box>
+          </Container>
+        </Grid>
+
+        {/* Right Side: Image */}
+        <RightSideImage
+          text="Homes as unique as you."
+          title="Reset password"
+          imgPath={img}
+        />
+      </Grid>
     </>
   )
 }
