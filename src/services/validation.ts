@@ -23,6 +23,10 @@ const validation: validationType = {
       message: "Enter a valid email",
     },
   },
+    OTP_VALIDATION: {
+    required: "otp is required",
+  
+  },
   PASSWORD_VALIDATION: (required: string) => ({
     required,
     minLength: {

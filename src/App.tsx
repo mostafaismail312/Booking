@@ -9,6 +9,7 @@ import ResetPass from './templates/AuthTemplate/ResetPass/ResetPass'
 import VerifyAccount from './templates/AuthTemplate/VerifyAccount/VerifyAccount'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import PATHS from './services/paths'
+import ChangePassword from './templates/AuthTemplate/ChangePassword/ChangePassword'
 
 function App() {
 
@@ -34,6 +35,10 @@ function App() {
         {
           path: PATHS.VERIFY_ACCOUNT_PATH,
           element: <VerifyAccount />,
+        },
+           {
+          path: PATHS.CHANGE_PASS_PATH,
+          element: <ChangePassword />,
         },
       ]
     },
