@@ -15,7 +15,7 @@ createRoot(document.getElementById("root")!).render(
       position="top-right" 
   reverseOrder={false} 
   toastOptions={{
-    duration: 3000, 
+    duration: 4000, 
   }} />
   </StrictMode>,
 );
