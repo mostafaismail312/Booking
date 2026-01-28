@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../../services/axiosInstance";
-import { ADMIN_URLS } from "../../../services/apiEndpoints";
+import { ADMIN_URLS, PORTAL_URLS } from "../../../services/apiEndpoints";
 import { isAxiosError } from "axios";
 import toast from "react-hot-toast";
 import Logo from "../../../components/AuthComponents/Logo/Logo";
@@ -35,7 +35,7 @@ export default function Login() {
   // =========== submit login ========
   const onSubmit = async (data: LoginProps) => {
     try {
-      const response = await axiosInstance.post(ADMIN_URLS.USER.LOGIN, data);
+      const response = await axiosInstance.post(PORTAL_URLS.USER.LOGIN, data);
       localStorage.setItem("token", response?.data.data.token);
       console.log("ana", response.data.data);
 
