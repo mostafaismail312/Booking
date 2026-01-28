@@ -7,6 +7,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -50,6 +51,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function Appbar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
+  
+  const [open, setOpen] = React.useState(false);
+
+  const handleClick = (event:any) => {
+    setAnchorEl(event.currentTarget);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -136,35 +148,46 @@ export default function Appbar() {
   );
 
   return (
-    <Box sx={{  }}>
-      <AppBar position="static">
-        <Toolbar>
+    <Box >
+      <AppBar position="static" sx={{backgroundColor:'#ffffff'  }}>
+        <Toolbar >
        
          
-          <Search>
+          <Search >
             <SearchIconWrapper>
-              <SearchIcon />
+              <SearchIcon sx={{ color: 'black'}} />
             </SearchIconWrapper>
             <StyledInputBase
+            sx={{ color: 'black'}}
+         
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
+             <IconButton size="large" edge="end" aria-label="account of current user" aria-controls={menuId} aria-haspopup="true" onClick={handleProfileMenuOpen} color="inherit">
+              <AccountCircle  sx={{ color: 'black', padding:'5px' }}/>
+               <Typography sx={{ color: 'black', fontSize: 16 }}>
+      Upskilling
+    </Typography>
             </IconButton>
+            <IconButton
+        size="large"
+        aria-label="dropdown menu"
+        color="#000"
+        onClick={handleClick}
+      >
+        <ExpandMoreIcon />
+      </IconButton>
+
+      
             <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
               <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
+                <NotificationsIcon  sx={{ color: 'black' }}/>
               </Badge>
             </IconButton>
-            <IconButton size="large" edge="end" aria-label="account of current user" aria-controls={menuId} aria-haspopup="true" onClick={handleProfileMenuOpen} color="inherit">
-              <AccountCircle />
-            </IconButton>
+           
           </Box>
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
             <IconButton size="large" aria-label="show more" aria-controls={mobileMenuId} aria-haspopup="true" onClick={handleMobileMenuOpen} color="inherit">
