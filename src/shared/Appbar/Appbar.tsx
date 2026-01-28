@@ -8,6 +8,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useAuth } from '../../context/AuthContext/AuthContext';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -49,6 +50,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function Appbar() {
+
+const userName=localStorage.getItem("userName");
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
   
@@ -169,7 +172,7 @@ export default function Appbar() {
              <IconButton size="large" edge="end" aria-label="account of current user" aria-controls={menuId} aria-haspopup="true" onClick={handleProfileMenuOpen} color="inherit">
               <AccountCircle  sx={{ color: 'black', padding:'5px' }}/>
                <Typography sx={{ color: 'black', fontSize: 16 }}>
-      Upskilling
+      {userName}
     </Typography>
             </IconButton>
             <IconButton
