@@ -148,8 +148,8 @@ export default function Appbar() {
   );
 
   return (
-    <Box >
-      <AppBar position="static" sx={{backgroundColor:'#ffffff'  }}>
+    <Box sx={{display:"flex",alignItems:'center',justifyContent:'center',marginTop:'20px'}}>
+      <AppBar position="static" sx={{backgroundColor:'#F8F9FB' ,width:'95%' }}>
         <Toolbar >
        
          
