@@ -20,7 +20,7 @@ export default function MasterLayout() {
            
             flexGrow: 1,
             overflow:'auto',
-            backgroundColor: '#4b0909',
+            backgroundColor: '#F8F9FB',
             padding: 2,
           }}
         >
