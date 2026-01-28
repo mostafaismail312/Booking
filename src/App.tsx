@@ -10,6 +10,9 @@ import VerifyAccount from './templates/AuthTemplate/VerifyAccount/VerifyAccount'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import PATHS from './services/paths'
 import ChangePassword from './templates/AuthTemplate/ChangePassword/ChangePassword'
+import MasterLayout from './shared/MasterLayout/MasterLayout'
+import { Dashboard } from '@mui/icons-material'
+import Rooms from './templates/DashboardTemplate/Rooms/Rooms'
 
 function App() {
 
@@ -41,6 +44,19 @@ function App() {
           element: <ChangePassword />,
         },
       ]
+    },
+    
+    {
+      path: "/dashboard",
+      element: <MasterLayout />,
+      errorElement: <NotFound />,
+      children: [
+        { index: true, element: <Dashboard /> },
+          { path: "rooms", element: <Rooms /> },
+      
+    
+      
+      ],
     },
 
    ] 
