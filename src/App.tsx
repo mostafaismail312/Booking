@@ -13,6 +13,8 @@ import ChangePassword from './templates/AuthTemplate/ChangePassword/ChangePasswo
 import MasterLayout from './shared/MasterLayout/MasterLayout'
 import { Dashboard } from '@mui/icons-material'
 import Rooms from './templates/DashboardTemplate/Rooms/Rooms'
+import Users from './templates/DashboardTemplate/Users/Users'
+import Home from './templates/DashboardTemplate/Home/Home'
 
 function App() {
 
@@ -51,8 +53,10 @@ function App() {
       element: <MasterLayout />,
       errorElement: <NotFound />,
       children: [
-        { index: true, element: <Dashboard /> },
+        { index: true, element: <Home/> },
+         { path: "home", element: <Home /> },
           { path: "rooms", element: <Rooms /> },
+           { path: "users", element: <Users /> },
       
     
       
