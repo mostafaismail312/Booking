@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   Paper, Table, TableBody, TableCell, TableContainer, TableHead,
   TablePagination, TableRow, IconButton, Menu, MenuItem, Dialog,
-  DialogTitle, DialogContent, DialogActions, Button, Typography, Stack
+  DialogTitle, DialogContent, DialogActions, Button, Typography, Stack,
+  Box
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -13,6 +14,8 @@ import toast from 'react-hot-toast';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SectionTitle from '../../../../shared/SectionTitle/SectionTitle';
+import { Add } from '@mui/icons-material';
 
 /* ===== Interfaces ===== */
 interface Facility { _id: string; name: string; }
@@ -119,6 +122,38 @@ const handleView = async () => {
 
 
   return (
+
+    <> 
+
+    <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          my: 2,
+        }}
+      >
+        <SectionTitle title="Rooms Table Details" />
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          size="large"
+          onClick={() => navigate("/dashboard/createroom")}
+          sx={{
+            textTransform: "none",
+            borderRadius: "7px",
+            backgroundColor: "#3F5FFF",
+            "&:hover": {
+              backgroundColor: "#2d44d2",
+            },
+          }}
+        >
+          {" "}
+          Add New Room{" "}
+        </Button>
+      </Box> 
+
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ height: '100%' }}>
         <Table stickyHeader>
@@ -238,5 +273,6 @@ const handleView = async () => {
         </DialogActions>
       </Dialog>
     </Paper>
+    </>
   );
 }
