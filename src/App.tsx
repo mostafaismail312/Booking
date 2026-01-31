@@ -12,9 +12,10 @@ import PATHS from './services/paths'
 import ChangePassword from './templates/AuthTemplate/ChangePassword/ChangePassword'
 import MasterLayout from './shared/MasterLayout/MasterLayout'
 import { Dashboard } from '@mui/icons-material'
-import Rooms from './templates/DashboardTemplate/Rooms/Rooms'
 import Users from './templates/DashboardTemplate/Users/Users'
 import Home from './templates/DashboardTemplate/Home/Home'
+import RoomList from './templates/DashboardTemplate/Rooms/RoomList/RoomList'
+import CreateRoom from './templates/DashboardTemplate/Rooms/CreateRoom/CreateRoom'
 
 function App() {
 
@@ -55,7 +56,9 @@ function App() {
       children: [
         { index: true, element: <Home/> },
          { path: "home", element: <Home /> },
-          { path: "rooms", element: <Rooms /> },
+          { path: "rooms", element: <RoomList /> },
+          { path: "createroom", element: <CreateRoom /> },
+          { path: "edit/:id", element: <CreateRoom /> },
            { path: "users", element: <Users /> },
       
     
