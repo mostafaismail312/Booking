@@ -17,7 +17,8 @@ import Users from "./templates/DashboardTemplate/Users/Users";
 import Home from "./templates/DashboardTemplate/Home/Home";
 import FacilitiesList from "./templates/DashboardTemplate/FacilitiesList/FacilitiesList";
 import FacilityData from "./templates/DashboardTemplate/FacilityData/FacilityData";
-import AdsList from "./templates/DashboardTemplate/AdsList/AdsList";
+import AdsList from "./templates/DashboardTemplate/ADS/AdsList/AdsList";
+import CreateAds from "./templates/DashboardTemplate/ADS/CreateAds/CreateAds";
 
 function App() {
   const routes = createBrowserRouter([
@@ -71,6 +72,8 @@ function App() {
           path: PATHS.ADS_LIST_PATH,
           element: <AdsList />,
         },
+         { path: "createads", element: <CreateAds /> },
+          { path: "editads/:id", element: <CreateAds /> },
       ],
     },
   ]);
