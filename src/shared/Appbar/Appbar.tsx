@@ -125,7 +125,7 @@ export default function Appbar() {
               }}
             >
               <Avatar
-                sx={{ width: 34, height: 34 }}
+                sx={{ width: 40, height: 40 }}
                 src={avatarSrc}
                 imgProps={{
                   onError: (e) => {
