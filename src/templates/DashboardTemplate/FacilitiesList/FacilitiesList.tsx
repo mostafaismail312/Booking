@@ -60,6 +60,18 @@ export default function FacilitiesList() {
     },
     buttonsStyling: false,
   });
+  //============deleteFacility =============
+   const deleteFacility = async (id: string | null) => {
+    if (!id) return;
+    try {
+      await axiosInstance.delete(ADMIN_URLS.ROOM.DELETE_ROOM_FACILITY(id));
+      toast.success("Facility Deleted successfully");
+      getAllFacilities(); // Refresh the list after deletion
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Something went wrong!");
+      console.error("Error deleting facility:", error);
+    }
+  };
 
   //==================  useEffect facilities ===========
   useEffect(() => {
@@ -137,7 +149,7 @@ export default function FacilitiesList() {
                     {" "}
                     {new Date(facility.updatedAt).toLocaleDateString()}
                   </TableCell>
-                  
+
                   <TableCell align="center">
                     <ActionBtn
                       onEdit={() => {
@@ -159,7 +171,7 @@ export default function FacilitiesList() {
                           })
                           .then((result) => {
                             if (result.isConfirmed) {
-                              // deleteFacility(facility._id);
+                              deleteFacility(facility._id);
                               swalWithBootstrapButtons.fire({
                                 title: "Deleted!",
                                 text: "The facility has been deleted.",
