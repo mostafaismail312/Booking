@@ -25,6 +25,7 @@ import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
+import PATHS from "../../services/paths";
 
 const drawerWidth = 300;
 
@@ -43,10 +44,10 @@ const pathMapping = {
   Home: "/dashboard/home",
   Users: "/dashboard/users",
   Rooms: "/dashboard/rooms",
-  Ads: "/dashboard/ads",
+  Ads: PATHS.ADS_LIST_PATH,
   Bookings: "/dashboard/bookings",
   Facilities: "/dashboard/facilities-list",
-  ChangePassword: "/dashboard/change-password",
+  ChangePassword:"/change-pass",
   Logout: "/dashboard/logout",
 };
 
