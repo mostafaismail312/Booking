@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { PieChart } from '@mui/x-charts/PieChart';
 import { axiosInstance } from '../../../services/axiosInstance';
 import { ADMIN_URLS } from '../../../services/apiEndpoints';
+import { Box, Stack, Typography } from "@mui/material";
 
 export default function Charts() {
 
@@ -31,10 +32,9 @@ export default function Charts() {
           fetchData();
         }, []);
     const data = [
-  { label: 'Group A', value: dashboardData?.bookings.pending, color: '#0088FE' },
-  { label: 'Group B', value:dashboardData?.bookings.completed, color: '#00C49F' },
-  { label: 'Group C', value: 300, color: '#FFBB28' },
-  { label: 'Group D', value: 200, color: '#FF8042' },
+  { label: 'Pending', value: dashboardData?.bookings.pending, color: '#5368F0' },
+  { label: 'Completed', value:dashboardData?.bookings.completed, color: '#9D57D5' },
+
 ];
 
 const settings = {
@@ -44,11 +44,30 @@ const settings = {
   hideLegend: true,
 };
   return (
-     <PieChart
-     sx={{margin:'20'}}
-      series={[{ innerRadius: 50, outerRadius: 100, data, arcLabel: 'value' }]}
-      {...settings}
-    />
+ 
+<Box sx={{ display: "flex", alignItems: "center" }}>
+  <PieChart
+    series={[{ innerRadius: 50, outerRadius: 100, data, arcLabel: "value" }]}
+    width={230}   
+    height={220}
+    margin={{ left: 0, right: 0, top: 0, bottom: 0 }} 
+    slotProps={{
+      legend: { hidden: true },
+    }}
+  />
+
+  {/* <Stack spacing={1} sx={{ ml: -2 }}> 
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Box sx={{ width: 12, height: 12, borderRadius: 0.7, bgcolor: data[0].color }} />
+      <Typography variant="body2">pending</Typography>
+    </Box>
+
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Box sx={{ width: 12, height: 12, borderRadius: 0.7, bgcolor: data[1].color }} />
+      <Typography variant="body2">completed</Typography>
+    </Box>
+  </Stack> */}
+</Box>
   )
 }
 
