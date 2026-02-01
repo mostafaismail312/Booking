@@ -53,8 +53,7 @@ const pathMapping: Record<string, string> = {
   Bookings: "/dashboard/bookings",
   Facilities: "/dashboard/facilities-list",
   ChangePassword: "/change-password",
-  Logout: "/dashboard/logout", // هنستغنى عنها في الـUI ونستخدم Dialog بدلها
-};
+  Logout: "/dashboard/logout", }
 
 export default function Drawerbar() {
   const [open, setOpen] = useState(true);
@@ -64,16 +63,14 @@ export default function Drawerbar() {
   const handleDrawerToggle = () => setOpen((p) => !p);
 
   const logout = () => {
-    // ✅ امسح اللي انت مخزنه
     localStorage.removeItem("token");
     localStorage.removeItem("userName");
     localStorage.removeItem("userId");
     localStorage.removeItem("role");
 
-    // لو عندك حاجات تانية: localStorage.clear();
 
     setOpenLogout(false);
-    navigate("/login", { replace: true }); // عدّلها لروت اللوجين عندك
+    navigate("/login", { replace: true });
   };
 
   const items = [
@@ -178,7 +175,6 @@ export default function Drawerbar() {
         </List>
       </Drawer>
 
-      {/* ✅ Logout Dialog */}
       <Dialog
         open={openLogout}
         onClose={() => setOpenLogout(false)}
