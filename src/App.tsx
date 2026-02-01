@@ -44,7 +44,7 @@ function App() {
           element: <VerifyAccount />,
         },
         {
-          path: PATHS.CHANGE_PASS_PATH,
+          path: 'change-password',
           element: <ChangePassword />,
         },
       ],
