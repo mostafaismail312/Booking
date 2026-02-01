@@ -44,7 +44,9 @@ function App() {
           element: <VerifyAccount />,
         },
         {
+
           path: 'change-password',
+
           element: <ChangePassword />,
         },
       ],
