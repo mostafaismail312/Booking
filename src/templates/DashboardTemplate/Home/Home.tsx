@@ -10,7 +10,7 @@ export default function Home() {
     <>
     <ChartsSquare/>
 
-    <Grid container spacing={2} sx={{margin:20}}>
+    <Grid container spacing={5} sx={{margin:20}}>
     
       <Grid size={6}>
         <Charts />
