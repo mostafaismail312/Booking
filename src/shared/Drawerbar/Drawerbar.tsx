@@ -52,8 +52,16 @@ const pathMapping: Record<string, string> = {
   Ads: PATHS.ADS_LIST_PATH,
   Bookings: "/dashboard/bookings",
   Facilities: "/dashboard/facilities-list",
+
   ChangePassword: "/change-password",
+<<<<<<< HEAD
   Logout: "/dashboard/logout", }
+=======
+  Logout: "/dashboard/logout", // هنستغنى عنها في الـUI ونستخدم Dialog بدلها
+
+ 
+};
+>>>>>>> e096d166604c546110fb1002520f1dc47c61e2ee
 
 export default function Drawerbar() {
   const [open, setOpen] = useState(true);
