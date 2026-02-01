@@ -19,6 +19,7 @@ import FacilitiesList from "./templates/DashboardTemplate/FacilitiesList/Facilit
 import FacilityData from "./templates/DashboardTemplate/FacilityData/FacilityData";
 import AdsList from "./templates/DashboardTemplate/ADS/AdsList/AdsList";
 import CreateAds from "./templates/DashboardTemplate/ADS/CreateAds/CreateAds";
+import ProtectedRoute from "./context/ProtectedRoute";
 
 function App() {
   const routes = createBrowserRouter([
@@ -43,7 +44,9 @@ function App() {
           element: <VerifyAccount />,
         },
         {
-          path: "change-pass",
+
+          path: 'change-password',
+
           element: <ChangePassword />,
         },
       ],
@@ -51,7 +54,7 @@ function App() {
 
     {
       path: PATHS.DASHBOARD_PATH,
-      element: <MasterLayout />,
+      element: <ProtectedRoute> <MasterLayout /></ProtectedRoute>,
       errorElement: <NotFound />,
       children: [
         { index: true, element: <Home /> },

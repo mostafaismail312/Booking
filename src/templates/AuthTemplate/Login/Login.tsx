@@ -37,6 +37,7 @@ export default function Login() {
     try {
       const response = await axiosInstance.post(PORTAL_URLS.USER.LOGIN, data);
       localStorage.setItem("token", response?.data.data.token);
+        localStorage.setItem("id", response?.data.data.user._id);
         localStorage.setItem("userName", response?.data.data.user.userName);
       console.log("ana", response.data.data);
 

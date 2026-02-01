@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Avatar,
@@ -15,8 +15,10 @@ import { styled } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { axiosInstance } from "../../services/axiosInstance";
+import { ADMIN_URLS } from "../../services/apiEndpoints";
 
-const SearchWrap = styled("div")(({ theme }) => ({
+const SearchWrap = styled("div")(() => ({
   display: "flex",
   alignItems: "center",
   gap: 10,
@@ -35,16 +37,60 @@ const SearchInput = styled(InputBase)(() => ({
   fontSize: 14,
 }));
 
-export default function Appbar() {
-  const userName = localStorage.getItem("userName") || "User";
+type Profile = {
+  _id?: string;
+  userName?: string;
+  profileImage?: string;
+  email?: string;
+};
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+export default function Appbar() {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(anchorEl);
+
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleMenuClose = () => setAnchorEl(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const userId =
+        localStorage.getItem("id");
+
+      if (!userId) {
+        console.warn("No userId found in localStorage");
+        setLoadingProfile(false);
+        return;
+      }
+
+      setLoadingProfile(true);
+      try {
+        const res = await axiosInstance.get(ADMIN_URLS.USER.GET_USER_PROFILE(userId));
+
+        const data = res.data?.data;
+        const p: Profile | null = data?.user ?? data ?? null;
+
+        setProfile(p);
+
+        // اختياري: تحديث الاسم في localStorage
+        if (p?.userName) localStorage.setItem("userName", p.userName);
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        setProfile(null);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const userName = profile?.userName || localStorage.getItem("userName") || "User";
+  const avatarSrc = profile?.profileImage || "";
 
   return (
     <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
@@ -80,26 +126,24 @@ export default function Appbar() {
             >
               <Avatar
                 sx={{ width: 34, height: 34 }}
-                src="" // حط لينك الصورة لو موجود
-              />
+                src={avatarSrc}
+                imgProps={{
+                  onError: (e) => {
+                    (e.currentTarget as HTMLImageElement).src = "";
+                  },
+                }}
+              >
+                {userName?.[0]?.toUpperCase()}
+              </Avatar>
             </IconButton>
 
-            <Typography
-              sx={{
-                color: "#111827",
-                fontWeight: 600,
-                fontSize: 14,
-              }}
-            >
-              {userName}
+            <Typography sx={{ color: "#111827", fontWeight: 600, fontSize: 14 }}>
+              {loadingProfile ? "..." : userName}
             </Typography>
 
             <IconButton
               onClick={handleProfileMenuOpen}
-              sx={{
-                p: 0.5,
-                "&:hover": { bgcolor: "rgba(0,0,0,0.04)" },
-              }}
+              sx={{ p: 0.5, "&:hover": { bgcolor: "rgba(0,0,0,0.04)" } }}
             >
               <ExpandMoreIcon sx={{ color: "#111827" }} />
             </IconButton>
@@ -111,12 +155,7 @@ export default function Appbar() {
                 "&:hover": { bgcolor: "rgba(0,0,0,0.04)" },
               }}
             >
-              <Badge
-                variant="dot"
-                color="error"
-                overlap="circular"
-                anchorOrigin={{ vertical: "top", horizontal: "right" }}
-              >
+              <Badge variant="dot" color="error" overlap="circular">
                 <NotificationsIcon sx={{ color: "#111827" }} />
               </Badge>
             </IconButton>
@@ -146,4 +185,5 @@ export default function Appbar() {
     </Box>
   );
 }
+
 

@@ -105,7 +105,8 @@ export const PORTAL_URLS = {
     // Path for Facebook OAuth login
     FACEBOOK_AUTH: `${baseURL}/portal/facebook-auth`, // As seen in Postman screenshot
     // Path to get current user profile for portal users
-    GET_USER_PROFILE: `${baseURL}/portal/users/currentUser`, // Assuming a dedicated endpoint for portal
+        GET_USER_PROFILE: (id: string) => `${baseURL}/portal/users/${id}`,
+     // Assuming a dedicated endpoint for portal
     // Path to update current user profile for portal users
     UPDATE_PROFILE: `${baseURL}/portal/users`,
     // Path to change password for portal users
