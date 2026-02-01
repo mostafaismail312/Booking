@@ -46,7 +46,7 @@ const pathMapping: Record<string, string> = {
   Ads: PATHS.ADS_LIST_PATH,
   Bookings: "/dashboard/bookings",
   Facilities: "/dashboard/facilities-list",
-  "Change Password": PATHS.CHANGE_PASS_PATH,
+  "Change Password": '/change-password',
   Logout: "/dashboard/logout",
 };
 
