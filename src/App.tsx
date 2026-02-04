@@ -20,6 +20,8 @@ import FacilityData from "./templates/DashboardTemplate/FacilityData/FacilityDat
 import AdsList from "./templates/DashboardTemplate/ADS/AdsList/AdsList";
 import CreateAds from "./templates/DashboardTemplate/ADS/CreateAds/CreateAds";
 import ProtectedRoute from "./context/ProtectedRoute";
+import RoomsExplore from "./templates/MasterLayoutTemplate/Rooms/RoomsExplore/RoomsExplore";
+import RoomDetails from "./templates/MasterLayoutTemplate/Rooms/RoomsDetails/RoomDetails";
 
 function App() {
   const routes = createBrowserRouter([
@@ -62,7 +64,7 @@ function App() {
         { path: "rooms", element: <RoomList /> },
           { path: "createroom", element: <CreateRoom /> },
           { path: "edit/:id", element: <CreateRoom /> },
-        { path: "users", element: <Users /> },
+          { path: "users", element: <Users /> },
         {
           path: "facilities-list",
           element: <FacilitiesList />,
@@ -79,6 +81,16 @@ function App() {
           { path: "editads/:id", element: <CreateAds /> },
       ],
     },
+
+    {
+    path: PATHS.MAIN_PATH, // "/"
+    errorElement: <NotFound />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: "rooms", element: <RoomsExplore /> },
+      { path: "room-details/:id", element: <RoomDetails /> },
+    ],
+  },
   ]);
 
   return (
