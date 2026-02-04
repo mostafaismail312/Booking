@@ -11,12 +11,12 @@ import PATHS from "./services/paths";
 import ChangePassword from "./templates/AuthTemplate/ChangePassword/ChangePassword";
 import MasterLayout from "./shared/MasterLayout/MasterLayout";
 import { Dashboard } from "@mui/icons-material";
-import RoomList from './templates/DashboardTemplate/Rooms/RoomList/RoomList'
-import CreateRoom from './templates/DashboardTemplate/Rooms/CreateRoom/CreateRoom'
+import RoomList from "./templates/DashboardTemplate/Rooms/RoomList/RoomList";
+import CreateRoom from "./templates/DashboardTemplate/Rooms/CreateRoom/CreateRoom";
 import Users from "./templates/DashboardTemplate/Users/Users";
 import Home from "./templates/DashboardTemplate/Home/Home";
-import FacilitiesList from "./templates/DashboardTemplate/FacilitiesList/FacilitiesList";
-import FacilityData from "./templates/DashboardTemplate/FacilityData/FacilityData";
+import FacilitiesList from "./templates/DashboardTemplate/Facilities/FacilitiesList/FacilitiesList";
+import FacilityData from "./templates/DashboardTemplate/Facilities/FacilityData/FacilityData";
 import AdsList from "./templates/DashboardTemplate/ADS/AdsList/AdsList";
 import CreateAds from "./templates/DashboardTemplate/ADS/CreateAds/CreateAds";
 
@@ -57,8 +57,8 @@ function App() {
         { index: true, element: <Home /> },
         { path: "home", element: <Home /> },
         { path: "rooms", element: <RoomList /> },
-          { path: "createroom", element: <CreateRoom /> },
-          { path: "edit/:id", element: <CreateRoom /> },
+        { path: "createroom", element: <CreateRoom /> },
+        { path: "edit/:id", element: <CreateRoom /> },
         { path: "users", element: <Users /> },
         {
           path: "facilities-list",
@@ -72,8 +72,8 @@ function App() {
           path: PATHS.ADS_LIST_PATH,
           element: <AdsList />,
         },
-         { path: "createads", element: <CreateAds /> },
-          { path: "editads/:id", element: <CreateAds /> },
+        { path: "createads", element: <CreateAds /> },
+        { path: "editads/:id", element: <CreateAds /> },
       ],
     },
   ]);
