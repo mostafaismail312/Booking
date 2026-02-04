@@ -9,21 +9,27 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TextField,
 } from "@mui/material";
-import SectionTitle from "../../../shared/SectionTitle/SectionTitle";
+import SectionTitle from "../../../../shared/SectionTitle/SectionTitle";
 import { Add } from "@mui/icons-material";
 import Swal from "sweetalert2";
-import { axiosInstance } from "./../../../services/axiosInstance";
-import { ADMIN_URLS } from "../../../services/apiEndpoints";
+import { axiosInstance } from "../../../../services/axiosInstance";
+import { ADMIN_URLS } from "../../../../services/apiEndpoints";
 import { useCallback, useEffect, useState } from "react";
 
 import { isAxiosError } from "axios";
 import toast from "react-hot-toast";
-import ActionBtn from "../../../shared/ActionBtn/ActionBtn";
+import ActionBtn from "../../../../shared/ActionBtn/ActionBtn";
+import { CustomDialog } from "../FacilityFormCard/FacilityFormCard";
 
 export default function FacilitiesList() {
   const [pageSize, setPageSize] = useState(15);
   const [pageNumber, setPageNumber] = useState(1);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+
   const [facilities, setFacilities] = useState<FacilityType[]>([]);
   const [facilitiesCount, setFacilitiesCount] = useState(0);
   const getAllFacilities = useCallback(
@@ -60,6 +66,18 @@ export default function FacilitiesList() {
     },
     buttonsStyling: false,
   });
+  //============deleteFacility =============
+  const deleteFacility = async (id: string | null) => {
+    if (!id) return;
+    try {
+      await axiosInstance.delete(ADMIN_URLS.ROOM.DELETE_ROOM_FACILITY(id));
+      toast.success("Facility Deleted successfully");
+      getAllFacilities(); // Refresh the list after deletion
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Something went wrong!");
+      console.error("Error deleting facility:", error);
+    }
+  };
 
   //==================  useEffect facilities ===========
   useEffect(() => {
@@ -137,10 +155,12 @@ export default function FacilitiesList() {
                     {" "}
                     {new Date(facility.updatedAt).toLocaleDateString()}
                   </TableCell>
-                  
+
                   <TableCell align="center">
                     <ActionBtn
                       onEdit={() => {
+                        setSelectedItem(facility.name); // ✅ هنا row معروف
+                        setOpenEdit(true);
                         // setSelectedFacility(facility);
                         // setAddFormTitle("Update Facility");
                         // setShowCardForm(true);
@@ -159,15 +179,15 @@ export default function FacilitiesList() {
                           })
                           .then((result) => {
                             if (result.isConfirmed) {
-                              // deleteFacility(facility._id);
+                              deleteFacility(facility._id);
                               swalWithBootstrapButtons.fire({
                                 title: "Deleted!",
                                 text: "The facility has been deleted.",
                                 icon: "success",
                               });
-                              //} else if (
-                              //   // result.dismiss === Swal.DismissReason.cancel
-                              // ) {
+                            } else if (
+                              result.dismiss === Swal.DismissReason.cancel
+                            ) {
                               swalWithBootstrapButtons.fire({
                                 title: "Cancelled",
                                 text: "Your facility data is safe :)",
@@ -183,6 +203,15 @@ export default function FacilitiesList() {
             </TableBody>
           </Table>
         </TableContainer>
+        {/* ===== EDIT DIALOG ===== */}
+        <CustomDialog
+          open={openEdit}
+          onClose={() => setOpenEdit(false)}
+          title="Edit Facility"
+        >
+          <TextField fullWidth label="Facility Name" />
+        </CustomDialog>
+
         <TablePagination
           rowsPerPageOptions={[10, 15, 25, 50, 100]}
           component="div"

@@ -53,9 +53,11 @@ const pathMapping: Record<string, string> = {
   Bookings: "/dashboard/bookings",
   Facilities: "/dashboard/facilities-list",
 
-  ChangePassword: "/change-password",
+  ChangePassword: PATHS.CHANGE_PASS_PATH,
+  Logout: "/dashboard/logout",
+};
 
-  Logout: "/dashboard/logout", }
+
  
 
 export default function Drawerbar() {
