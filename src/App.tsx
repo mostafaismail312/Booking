@@ -22,6 +22,7 @@ import CreateAds from "./templates/DashboardTemplate/ADS/CreateAds/CreateAds";
 import ProtectedRoute from "./context/ProtectedRoute";
 import RoomsExplore from "./templates/MasterLayoutTemplate/Rooms/RoomsExplore/RoomsExplore";
 import RoomDetails from "./templates/MasterLayoutTemplate/Rooms/RoomsDetails/RoomDetails";
+import LandingPage from "./shared/LandingPage/LandingPage";
 
 function App() {
   const routes = createBrowserRouter([
@@ -86,8 +87,9 @@ function App() {
     {
     path: PATHS.MAIN_PATH, // "/"
     errorElement: <NotFound />,
+      element: <LandingPage />,
     children: [
-      { index: true, element: <Home /> },
+      { index: true, element: <LandingPage /> },
       { path: "rooms", element: <RoomsExplore /> },
       { path: "room-details/:id", element: <RoomDetails /> },
     ],
