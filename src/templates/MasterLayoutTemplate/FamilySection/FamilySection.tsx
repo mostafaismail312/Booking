@@ -81,26 +81,30 @@ export default function FamilySection() {
           <Grid
             container
             alignItems="center"
-            spacing={{ xs: 4, md: 8 }}
-            sx={{ width: "90%" }}
+            spacing={{ xs: 3, md: 4 }}          
+            columnSpacing={{ xs: 2, md: 3 }}   
+            sx={{ width: "100%" }}             
           >
-            {/* LEFT (Photo swiper) */}
-            <Grid size={6}>
+      
+            <Grid size={{ xs: 12, md: 6 }}>
               <Box
                 onMouseEnter={() => setPaused(true)}
                 onMouseLeave={() => setPaused(false)}
                 sx={{
                   position: "relative",
                   width: "100%",
-                  maxWidth: 520,
+                  maxWidth: { xs: "100%", md: 560 }, // ✅ بدل 520
                   mx: { xs: "auto", md: 0 },
                 }}
               >
-              
+                {/* Back outline frame */}
                 <Box
                   sx={{
                     position: "absolute",
-                    inset: { xs: "-14px -14px 14px 14px", md: "-18px -18px 18px 18px" },
+                    inset: {
+                      xs: "-14px -14px 14px 14px",
+                      md: "-18px -18px 18px 18px",
+                    },
                     borderRadius: 3,
                     border: "2px solid rgba(20,43,85,0.10)",
                     bgcolor: "transparent",
@@ -108,7 +112,7 @@ export default function FamilySection() {
                   }}
                 />
 
-               
+         
                 <Box
                   sx={{
                     position: "relative",
@@ -118,13 +122,10 @@ export default function FamilySection() {
                     width: "100%",
                     boxShadow: "0 24px 60px rgba(20,43,85,0.14)",
                     bgcolor: "#eaf3ff",
-
-                   
                     borderRadius: 14,
                     borderBottomRightRadius: 120,
                   }}
                 >
-                  {/* cross-fade slides */}
                   {slides.map((s, i) => (
                     <Box
                       key={s.src}
@@ -148,8 +149,8 @@ export default function FamilySection() {
               </Box>
             </Grid>
 
-            {/* RIGHT (Text + controls) */}
-            <Grid size={6}>
+          
+            <Grid size={{ xs: 12, md: 6 }}>
               <Stack spacing={2} sx={{ maxWidth: 560 }}>
                 <Typography
                   sx={{
@@ -164,7 +165,10 @@ export default function FamilySection() {
                 {/* Stars */}
                 <Box sx={{ display: "flex", gap: 0.4 }}>
                   {Array.from({ length: current.stars ?? 5 }).map((_, idx) => (
-                    <StarRoundedIcon key={idx} sx={{ color: "#F5B301", fontSize: 26 }} />
+                    <StarRoundedIcon
+                      key={idx}
+                      sx={{ color: "#F5B301", fontSize: 26 }}
+                    />
                   ))}
                 </Box>
 
@@ -179,11 +183,13 @@ export default function FamilySection() {
                   {current.quote}
                 </Typography>
 
-                <Typography sx={{ color: "rgba(20,43,85,0.45)", fontWeight: 600 }}>
+                <Typography
+                  sx={{ color: "rgba(20,43,85,0.45)", fontWeight: 600 }}
+                >
                   {current.name}, {current.role}
                 </Typography>
 
-                {/* Controls (like screenshot) */}
+                {/* Controls */}
                 <Box sx={{ display: "flex", gap: 2, pt: 1 }}>
                   <IconButton
                     onClick={() => go(active - 1)}
@@ -214,7 +220,7 @@ export default function FamilySection() {
                   </IconButton>
                 </Box>
 
-                {/* optional dots */}
+                {/* Dots */}
                 <Box sx={{ display: "flex", gap: 1, pt: 1 }}>
                   {slides.map((_, i) => (
                     <Box
@@ -224,7 +230,10 @@ export default function FamilySection() {
                         width: i === active ? 22 : 8,
                         height: 8,
                         borderRadius: 999,
-                        bgcolor: i === active ? "rgba(45,85,255,0.95)" : "rgba(20,43,85,0.15)",
+                        bgcolor:
+                          i === active
+                            ? "rgba(45,85,255,0.95)"
+                            : "rgba(20,43,85,0.15)",
                         cursor: "pointer",
                         transition: "all 220ms ease",
                       }}
@@ -239,4 +248,5 @@ export default function FamilySection() {
     </Box>
   );
 }
+
 
