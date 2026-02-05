@@ -93,11 +93,11 @@ export default function FamilySection() {
                 sx={{
                   position: "relative",
                   width: "100%",
-                  maxWidth: { xs: "100%", md: 560 }, // ✅ بدل 520
+                  maxWidth: { xs: "100%", md: 560 }, 
                   mx: { xs: "auto", md: 0 },
                 }}
               >
-                {/* Back outline frame */}
+             
                 <Box
                   sx={{
                     position: "absolute",

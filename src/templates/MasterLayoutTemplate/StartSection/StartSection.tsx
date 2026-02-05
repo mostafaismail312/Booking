@@ -16,12 +16,17 @@ import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import { useNavigate } from "react-router-dom";
 
 type Slide = { src: string; alt: string };
 
 export default function StartSection() {
+    const [startDate, setStartDate] = useState<Date>(new Date("2023-01-20"));
+const [endDate, setEndDate] = useState<Date>(new Date("2023-01-30"));
+const formatDate = (d: Date) => d.toISOString().slice(0, 10);
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up("md"));
+const navigate = useNavigate();
 
   const slides: Slide[] = useMemo(
     () => [
@@ -50,6 +55,17 @@ export default function StartSection() {
     setActive(((next % len) + len) % len);
   };
 
+  const handleExplore = () => {
+  const qs = new URLSearchParams({
+    page: "1",
+    size: "10",
+    startDate: formatDate(startDate),
+    endDate: formatDate(endDate),
+  }).toString();
+
+  navigate(`/rooms?${qs}`);
+};
+
   useEffect(() => {
     if (paused) return;
     const id = window.setInterval(() => go(active + 1), 3500);
@@ -58,9 +74,9 @@ export default function StartSection() {
 
   return (
     <Box sx={{ py: { xs: 5, md: 8 }, bgcolor: "#fff", width: "100%" }}>
-      {/* ✅ Full width container */}
+     
       <Container maxWidth={false} disableGutters>
-        {/* ✅ add padding manually */}
+      
         <Box sx={{ px: { xs: 6, md: 12 } }}>
           <Grid
             container
@@ -221,6 +237,7 @@ export default function StartSection() {
 
                     <Button
                       variant="contained"
+                      onClick={handleExplore}
                       sx={{
                         mt: 1,
                         height: 44,
@@ -246,11 +263,11 @@ export default function StartSection() {
                 sx={{
                   position: "relative",
                   width: "100%",
-                  maxWidth: "100%", // ✅ was 560
+                  maxWidth: "100%", 
                   mx: { xs: "auto", md: "unset" },
                 }}
               >
-                {/* back outline card */}
+           
                 <Box
                   sx={{
                     position: "absolute",
@@ -273,8 +290,8 @@ export default function StartSection() {
     boxShadow: "0 24px 60px rgba(20,43,85,0.14)",
     bgcolor: "#eaf3ff",
 
-    borderRadius: 0,           // باقي الزوايا
-    borderTopLeftRadius: 110,   // 👈 الانحناء الكبير فوق شمال
+    borderRadius: 0,          
+    borderTopLeftRadius: 110,   
   }}
 >
                  
