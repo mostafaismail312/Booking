@@ -92,6 +92,7 @@ function App() {
       { index: true, element: <LandingPage /> },
       { path: "rooms", element: <RoomsExplore /> },
       { path: "room-details/:id", element: <RoomDetails /> },
+      { path: "roomsexplore", element: <RoomsExplore /> },
     ],
   },
   ]);
