@@ -89,6 +89,7 @@ function App() {
       { index: true, element: <Home /> },
       { path: "rooms", element: <RoomsExplore /> },
       { path: "room-details/:id", element: <RoomDetails /> },
+      { path: "roomsexplore", element: <RoomsExplore /> },
     ],
   },
   ]);
