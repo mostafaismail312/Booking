@@ -20,14 +20,14 @@ import { useEffect, useState } from "react";
 import logoMain from "/color-logo-Ci_5FMX-.svg";
 // import { useFavorite } from "@/store/AuthContext/FavoriteContext";
 import { Link as RouterLink } from "react-router-dom";
-import { Link as MUILink } from "@mui/material";
+// import { Link as MUILink } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import LogoutIcon from "@mui/icons-material/Logout";
 import Swal from "sweetalert2";
 import { CircularProgress } from "@mui/material";
-import { FavoriteBorder } from "@mui/icons-material";
-import { useAuth } from "../../../context/AuthContext/AuthContext";
+// import { FavoriteBorder } from "@mui/icons-material";
+import { useAuth } from "../../context/AuthContext/AuthContext";
 
 const Navbar = () => {
   const swalWithBootstrapButtons = Swal.mixin({
@@ -42,7 +42,7 @@ const Navbar = () => {
   const isMobile = useMediaQuery("(max-width: 900px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-//   const { favoriteItemsCount, refreshFavorites } = useFavorite(); //  get count and refresh
+  //   const { favoriteItemsCount, refreshFavorites } = useFavorite(); //  get count and refresh
   const { fullUserData, logOutUser, loginData } = useAuth();
 
   const userName = fullUserData?.userName || "Guest";
@@ -79,7 +79,7 @@ const Navbar = () => {
       });
   };
   useEffect(() => {
-    refreshFavorites();
+    // refreshFavorites();
     const timeout = setTimeout(() => {
       setIsLoading(false);
     }, 500);
@@ -201,7 +201,7 @@ const Navbar = () => {
                   )}
 
                   {/* Favorites */}
-
+                  {/* 
                   {localStorage.getItem("token") && loginData ? (
                     <Badge badgeContent={favoriteItemsCount || 0} color="error">
                       <Typography variant="button">
@@ -235,7 +235,7 @@ const Navbar = () => {
                     >
                       Login Now
                     </Button>
-                  )}
+                  )} */}
 
                   {/* Avatar with Dropdown */}
                   {localStorage.getItem("token") && loginData ? (
@@ -344,11 +344,11 @@ const Navbar = () => {
                   onClick={() => setDrawerOpen(false)}
                 >
                   <ListItemText primary="Favorites" />
-                  <Badge
+                  {/* <Badge
                     badgeContent={favoriteItemsCount ?? 0}
                     color="error"
                     sx={{ ml: 1 }}
-                  />
+                  /> */}
                 </ListItemButton>
 
                 {/* Avatar + Logout */}

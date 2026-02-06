@@ -23,6 +23,7 @@ import ProtectedRoute from "./context/ProtectedRoute";
 import RoomsExplore from "./templates/MasterLayoutTemplate/Rooms/RoomsExplore/RoomsExplore";
 import RoomDetails from "./templates/MasterLayoutTemplate/Rooms/RoomsDetails/RoomDetails";
 import LandingPage from "./shared/LandingPage/LandingPage";
+import MainLayout from "./shared/MainLayout/MainLayout";
 
 function App() {
   const routes = createBrowserRouter([
@@ -47,8 +48,7 @@ function App() {
           element: <VerifyAccount />,
         },
         {
-
-          path: 'change-password',
+          path: "change-password",
 
           element: <ChangePassword />,
         },
@@ -57,7 +57,12 @@ function App() {
 
     {
       path: PATHS.DASHBOARD_PATH,
-      element: <ProtectedRoute> <MasterLayout /></ProtectedRoute>,
+      element: (
+        <ProtectedRoute>
+          {" "}
+          <MasterLayout />
+        </ProtectedRoute>
+      ),
       errorElement: <NotFound />,
       children: [
         { index: true, element: <Home /> },
@@ -85,15 +90,16 @@ function App() {
     },
 
     {
-    path: PATHS.MAIN_PATH, // "/"
-    errorElement: <NotFound />,
-      element: <LandingPage />,
-    children: [
-      { index: true, element: <LandingPage /> },
-      { path: "rooms", element: <RoomsExplore /> },
-      { path: "room-details/:id", element: <RoomDetails /> },
-    ],
-  },
+      path: PATHS.MAIN_PATH, // "/"
+      errorElement: <NotFound />,
+      element: <MainLayout />,
+      children: [
+        { index: true, element: <LandingPage /> },
+        { path: "landing-page", element: <LandingPage /> },
+        { path: "rooms", element: <RoomsExplore /> },
+        { path: "room-details/:id", element: <RoomDetails /> },
+      ],
+    },
   ]);
 
   return (
