@@ -90,8 +90,8 @@ export default function StartSection() {
       // people: String(people),
     }).toString();
 
-  navigate(`/roomsexplore?${qs}`);
-};
+    navigate(`/rooms?${qs}`);
+  };
 
   useEffect(() => {
     if (paused) return;
@@ -250,7 +250,7 @@ export default function StartSection() {
                           borderRadius: 1.6,
                           textTransform: "none",
                           fontWeight: 800,
-                          boxShadow: "0 10px 20px rgba(56,92,255,0.25)",
+                          boxShadow: "0 10px 22px rgba(56,92,255,0.25)",
                         }}
                       >
                         Explore
@@ -260,8 +260,7 @@ export default function StartSection() {
                 </Stack>
               </Grid>
 
-              {/* RIGHT ... (كما هو عندك) */}
-              <Grid size={5}>{/* ... */}</Grid>
+           <Grid size={5}> <Box onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} sx={{ position: "relative", width: "100%", maxWidth: "100%", mx: { xs: "auto", md: "unset" }, }} > <Box sx={{ position: "absolute", inset: { xs: "16px 12px -10px 40px", md: "18px 18px -14px 60px", }, borderRadius: 4, border: "2px solid rgba(20,43,85,0.08)", bgcolor: "#fff", }} /> <Box sx={{ position: "relative", overflow: "hidden", height: { xs: 260, sm: 320, md: 460 }, boxShadow: "0 24px 60px rgba(20,43,85,0.14)", bgcolor: "#eaf3ff", borderRadius: 0, borderTopLeftRadius: 110, }} > {slides.map((s, i) => ( <Box key={s.src} component="img" src={s.src} alt={s.alt} sx={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: i === active ? 1 : 0, transform: i === active ? "scale(1.02)" : "scale(1.06)", transition: "opacity 650ms ease, transform 900ms ease", willChange: "opacity, transform", }} /> ))} {/* controls */} {/* <Box sx={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", px: 1, pointerEvents: "none", }} > <IconButton onClick={() => go(active - 1)} sx={{ pointerEvents: "auto", bgcolor: "rgba(255,255,255,0.85)", "&:hover": { bgcolor: "rgba(255,255,255,0.95)" }, }} > <ChevronLeftRoundedIcon /> </IconButton> <IconButton onClick={() => go(active + 1)} sx={{ pointerEvents: "auto", bgcolor: "rgba(255,255,255,0.85)", "&:hover": { bgcolor: "rgba(255,255,255,0.95)" }, }} > <ChevronRightRoundedIcon /> </IconButton> </Box> */} {/* dots */} <Box sx={{ position: "absolute", left: 0, right: 0, bottom: 14, display: "flex", justifyContent: "center", gap: 1, }} > {slides.map((_, i) => ( <Box key={i} onClick={() => go(i)} sx={{ width: i === active ? 22 : 8, height: 8, borderRadius: 999, bgcolor: i === active ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.55)", cursor: "pointer", transition: "all 220ms ease", }} /> ))} </Box> </Box> </Box> </Grid>
             </Grid>
           </Box>
         </Container>
