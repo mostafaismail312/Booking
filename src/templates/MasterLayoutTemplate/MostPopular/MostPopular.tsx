@@ -216,6 +216,8 @@ export default function MostPopular() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
 
+
+
   // Dialog state
   const [loginOpen, setLoginOpen] = useState(false);
 
@@ -255,11 +257,9 @@ export default function MostPopular() {
 
     navigate("/fav-list"); 
   };
-
   const handleView = (adId: string) => {
-    console.log("view", adId);
-     navigate("/rooms");
-  };
+  navigate(`/most-popular-details/${adId}`);
+};
 
   return (
     <Box sx={{ py: { xs: 4, md: 6 }, bgcolor: "#fff" }}>
