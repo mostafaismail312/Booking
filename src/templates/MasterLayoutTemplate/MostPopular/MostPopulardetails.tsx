@@ -86,7 +86,7 @@ const url = `${BASE}/api/v0/portal/ads/${id}`;
         const res = await axiosInstance.get(url
         );
 
-        // ✅ حسب الريسبونس بتاعك: data.ads
+      
         const item: ApiAdDetails | null = res.data?.data?.ads ?? null;
         setAd(item);
       } catch (e: any) {
@@ -313,12 +313,12 @@ const url = `${BASE}/api/v0/portal/ads/${id}`;
                     </Typography>
                   </Stack>
 
-                  <Typography sx={{ mt: 1, color: "rgba(20,43,85,0.55)", fontWeight: 700 }}>
+                  {/* <Typography sx={{ mt: 1, color: "rgba(20,43,85,0.55)", fontWeight: 700 }}>
                     Ad ID: {ad._id}
                   </Typography>
                   <Typography sx={{ color: "rgba(20,43,85,0.55)", fontWeight: 700 }}>
                     Room ID: {ad.room?._id}
-                  </Typography>
+                  </Typography> */}
                 </Stack>
 
                 {/* Actions */}
