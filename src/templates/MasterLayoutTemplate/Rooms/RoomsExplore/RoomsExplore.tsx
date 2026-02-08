@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Container, Typography } from "@mui/material";
 import { axiosInstance } from "../../../../services/axiosInstance";
 import { PORTAL_URLS } from "../../../../services/apiEndpoints";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import defaultpic from "../../../../assets/images/defaultroom.png";
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -31,26 +31,29 @@ export default function RoomsExplore() {
 
     const [rooms, setRooms] = useState<Room[]>([]);
     const navigate = useNavigate();
-    
+
+    const [searchParams] = useSearchParams();
+    const page = Number(searchParams.get("page") ?? 1);
+    const size = Number(searchParams.get("size") ?? 10);
+    const startDate = searchParams.get("startDate") ?? "";
+    const endDate = searchParams.get("endDate") ?? "";
 
     useEffect(() => {
-    axiosInstance
-      .get(
-        `${PORTAL_URLS.ROOMS.GET_ALL_ROOMS}/available`,
-        {
-          params: {
-            page: 1,
-            size: 10,
-            startDate: "2023-01-20",
-            endDate: "2023-01-30",
-          },
-        }
-      )
-      .then((res) => {
-        setRooms(res.data?.data?.rooms || []);
-      })
-      .catch(console.error);
-  }, []);
+  axiosInstance
+    .get(`${PORTAL_URLS.ROOMS.GET_ALL_ROOMS}/available`, {
+      params: {
+        page,
+        size,
+        startDate,
+        endDate,
+      },
+    })
+    .then((res) => {
+      setRooms(res.data?.data?.rooms || []);
+    })
+    .catch(console.error);
+}, [page, size, startDate, endDate]);
+
 
 
   return (
@@ -60,8 +63,7 @@ export default function RoomsExplore() {
     <Grid container spacing={4} justifyContent="center">
       {rooms.map((room) => (
         <Grid
-          item
-          md={4}
+          size={4}
           key={room._id}
           sx={{
             display: "flex",
@@ -90,7 +92,7 @@ export default function RoomsExplore() {
               <Box
                 component="img"
                 src={room.images?.[0] || defaultpic}
-                alt={room.title || "Room"}
+                alt={ "Room"}
                 sx={{
                   width: "100%",
                   height: "100%",
@@ -132,10 +134,10 @@ export default function RoomsExplore() {
               }}
             >
               <Typography variant="subtitle1" fontWeight={600} noWrap>
-                {room.title || "Luxury Room"}
+                { "Luxury Room"}
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                {room.location || "City Center"}
+                { "City Center"}
               </Typography>
             </Box>
           </Box>

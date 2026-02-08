@@ -63,7 +63,7 @@ const navigate = useNavigate();
     endDate: formatDate(endDate),
   }).toString();
 
-  navigate(`/rooms?${qs}`);
+  navigate(`/roomsexplore?${qs}`);
 };
 
   useEffect(() => {
