@@ -90,8 +90,8 @@ export default function StartSection() {
       // people: String(people),
     }).toString();
 
-    navigate(`/rooms?${qs}`);
-  };
+  navigate(`/roomsexplore?${qs}`);
+};
 
   useEffect(() => {
     if (paused) return;
