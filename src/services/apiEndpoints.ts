@@ -78,6 +78,7 @@ export const ADMIN_URLS = {
     DELETE_AD: (id: string): string => `${baseURL}/admin/Ads/${id}`,
     // Path to get all ads (admin view, with filtering/pagination)
     GET_ALL_ADS: `${baseURL}/admin/Ads`,
+    
   },
 
   // Dashboard Endpoints within Admin
