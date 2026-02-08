@@ -24,6 +24,7 @@ import RoomsExplore from "./templates/MasterLayoutTemplate/Rooms/RoomsExplore/Ro
 import RoomDetails from "./templates/MasterLayoutTemplate/Rooms/RoomsDetails/RoomDetails";
 import LandingPage from "./shared/LandingPage/LandingPage";
 import MainLayout from "./shared/MainLayout/MainLayout";
+import Fav from "./templates/MasterLayoutTemplate/Fav/Fav";
 
 function App() {
   const routes = createBrowserRouter([
@@ -98,6 +99,7 @@ function App() {
         { path: "landing-page", element: <LandingPage /> },
         { path: "rooms", element: <RoomsExplore /> },
         { path: "room-details/:id", element: <RoomDetails /> },
+        { path: "fav-list", element: <Fav /> },
       ],
     },
   ]);
