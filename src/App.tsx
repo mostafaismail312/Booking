@@ -59,7 +59,7 @@ function App() {
     {
       path: PATHS.DASHBOARD_PATH,
       element: (
-        <ProtectedRoute>
+        <ProtectedRoute allowedRoles={["admin"]}>
           {" "}
           <MasterLayout />
         </ProtectedRoute>
