@@ -1,16 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Container,
-  Grid,
   IconButton,
   Skeleton,
+  Grid,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
+
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+
 import { ADMIN_URLS } from "../../../services/apiEndpoints";
 import { axiosInstance } from "../../../services/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 type ApiRoom = {
   _id: string;
@@ -48,9 +56,13 @@ function getLocationFallback() {
 function AdCard({
   ad,
   variant,
+  onFavourite,
+  onView,
 }: {
   ad: ApiAd;
   variant: "large" | "small";
+  onFavourite: (adId: string) => void;
+  onView: (adId: string) => void;
 }) {
   const img = getImage(ad);
   const title = getTitle(ad);
@@ -65,6 +77,7 @@ function AdCard({
     <Box
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => onView(ad._id)}
       sx={{
         position: "relative",
         height:
@@ -105,7 +118,7 @@ function AdCard({
         }}
       />
 
-      {/* ✅ Hover actions in the CENTER */}
+      {/* Hover actions in the CENTER */}
       <Box
         sx={{
           position: "absolute",
@@ -124,7 +137,7 @@ function AdCard({
         <IconButton
           onClick={(e) => {
             e.stopPropagation();
-            console.log("favourite", ad._id);
+            onFavourite(ad._id);
           }}
           sx={{
             bgcolor: "rgba(255,255,255,0.25)",
@@ -139,7 +152,7 @@ function AdCard({
         <IconButton
           onClick={(e) => {
             e.stopPropagation();
-            console.log("view", ad._id);
+            onView(ad._id);
           }}
           sx={{
             bgcolor: "rgba(255,255,255,0.25)",
@@ -203,6 +216,14 @@ export default function MostPopular() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
 
+  // Dialog state
+  const [loginOpen, setLoginOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  // token check
+  const token = useMemo(() => localStorage.getItem("token"), []);
+
   useEffect(() => {
     const run = async () => {
       try {
@@ -224,6 +245,21 @@ export default function MostPopular() {
 
   const first = ads[0];
   const rest = ads.slice(1, 5);
+
+  const handleFavourite = (adId: string) => {
+    if (!token) {
+      setLoginOpen(true);
+      return;
+    }
+
+
+    navigate("/fav-list"); 
+  };
+
+  const handleView = (adId: string) => {
+    console.log("view", adId);
+     navigate("/rooms");
+  };
 
   return (
     <Box sx={{ py: { xs: 4, md: 6 }, bgcolor: "#fff" }}>
@@ -277,7 +313,12 @@ export default function MostPopular() {
             <Grid container spacing={3} alignItems="stretch">
               {/* Left big card */}
               <Grid size={5}>
-                <AdCard ad={first} variant="large" />
+                <AdCard
+                  ad={first}
+                  variant="large"
+                  onFavourite={handleFavourite}
+                  onView={handleView}
+                />
               </Grid>
 
               {/* Right 2x2 grid */}
@@ -285,7 +326,12 @@ export default function MostPopular() {
                 <Grid container spacing={3}>
                   {rest.map((ad) => (
                     <Grid key={ad._id} size={6}>
-                      <AdCard ad={ad} variant="small" />
+                      <AdCard
+                        ad={ad}
+                        variant="small"
+                        onFavourite={handleFavourite}
+                        onView={handleView}
+                      />
                     </Grid>
                   ))}
                 </Grid>
@@ -300,8 +346,62 @@ export default function MostPopular() {
           )}
         </Box>
       </Container>
+
+      {/* Login Dialog */}
+      <Dialog
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            border: "1px solid rgba(20,43,85,0.08)",
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 900, color: "#142B55" }}>
+          Login required
+        </DialogTitle>
+
+        <DialogContent>
+          <Typography sx={{ color: "rgba(20,43,85,0.65)", lineHeight: 1.7 }}>
+            You need to login first to add items to your favourites.
+          </Typography>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 2, gap: 1 }}>
+          <Button
+            variant="outlined"
+            onClick={() => setLoginOpen(false)}
+            sx={{
+              borderRadius: 1.6,
+              textTransform: "none",
+              fontWeight: 800,
+              borderColor: "rgba(20,43,85,0.2)",
+              color: "#142B55",
+            }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={() => {
+              setLoginOpen(false);
+              navigate("/login");
+            }}
+            sx={{
+              borderRadius: 1.6,
+              textTransform: "none",
+              fontWeight: 900,
+              boxShadow: "0 10px 20px rgba(56,92,255,0.25)",
+            }}
+          >
+            Login
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
-
-
