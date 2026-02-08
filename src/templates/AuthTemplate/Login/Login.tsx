@@ -40,6 +40,8 @@ export default function Login() {
         localStorage.setItem("id", response?.data.data.user._id);
         localStorage.setItem("userName", response?.data.data.user.userName);
       console.log("ana", response.data.data);
+        localStorage.setItem("role", response?.data.data?.user.role);
+
 
       if (response?.data.data?.user.role != "user") {
         navigate(DASHBOARD_PATH);
