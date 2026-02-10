@@ -28,6 +28,8 @@ import Swal from "sweetalert2";
 import { CircularProgress } from "@mui/material";
 // import { FavoriteBorder } from "@mui/icons-material";
 import { useAuth } from "../../context/AuthContext/AuthContext";
+import { useFavorite } from "../../context/FavoriteContext/FavoriteContext";
+import { FavoriteBorder } from "@mui/icons-material";
 
 const Navbar = () => {
   const swalWithBootstrapButtons = Swal.mixin({
@@ -42,7 +44,7 @@ const Navbar = () => {
   const isMobile = useMediaQuery("(max-width: 900px)");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  //   const { favoriteItemsCount, refreshFavorites } = useFavorite(); //  get count and refresh
+  const { favoriteItemsCount, refreshFavorites } = useFavorite(); //  get count and refresh
   const { fullUserData, logOutUser, loginData } = useAuth();
 
   const userName = fullUserData?.userName || "Guest";
@@ -79,7 +81,7 @@ const Navbar = () => {
       });
   };
   useEffect(() => {
-    // refreshFavorites();
+    refreshFavorites();
     const timeout = setTimeout(() => {
       setIsLoading(false);
     }, 500);
@@ -201,13 +203,13 @@ const Navbar = () => {
                   )}
 
                   {/* Favorites */}
-                  {/* 
+                  
                   {localStorage.getItem("token") && loginData ? (
                     <Badge badgeContent={favoriteItemsCount || 0} color="error">
                       <Typography variant="button">
                         {" "}
-                        <MUILink
-                          underline="none"
+                        <Typography 
+                          
                           sx={{
                             textDecoration: "none",
                             color: "#152C5B",
@@ -217,7 +219,7 @@ const Navbar = () => {
                           to="/fav-list"
                         >
                           <FavoriteBorder />
-                        </MUILink>{" "}
+                        </Typography>{" "}
                       </Typography>
                     </Badge>
                   ) : (
@@ -235,7 +237,7 @@ const Navbar = () => {
                     >
                       Login Now
                     </Button>
-                  )} */}
+                  )}
 
                   {/* Avatar with Dropdown */}
                   {localStorage.getItem("token") && loginData ? (
