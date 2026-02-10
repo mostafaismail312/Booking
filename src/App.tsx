@@ -25,6 +25,7 @@ import RoomDetails from "./templates/MasterLayoutTemplate/Rooms/RoomsDetails/Roo
 import LandingPage from "./shared/LandingPage/LandingPage";
 import MainLayout from "./shared/MainLayout/MainLayout";
 import Fav from "./templates/MasterLayoutTemplate/Fav/Fav";
+import MostPopulardetails from "./templates/MasterLayoutTemplate/MostPopular/MostPopulardetails";
 
 function App() {
   const routes = createBrowserRouter([
@@ -59,7 +60,7 @@ function App() {
     {
       path: PATHS.DASHBOARD_PATH,
       element: (
-        <ProtectedRoute>
+        <ProtectedRoute allowedRoles={["admin"]}>
           {" "}
           <MasterLayout />
         </ProtectedRoute>
@@ -99,7 +100,9 @@ function App() {
         { path: "landing-page", element: <LandingPage /> },
         { path: "rooms", element: <RoomsExplore /> },
         { path: "room-details/:id", element: <RoomDetails /> },
+        { path: "roomsexplore", element: <RoomsExplore /> },
         { path: "fav-list", element: <Fav /> },
+         { path: "/most-popular-details/:id", element: <MostPopulardetails /> },
       ],
     },
   ]);

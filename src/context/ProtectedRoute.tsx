@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { LOGIN_PATH } from "../services/paths";
-type Role = "Manager" | "Employee";
+type Role = "admin" | "user";
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
@@ -11,10 +11,14 @@ type ProtectedRouteProps = {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children ,allowedRoles }) => {
  const location = useLocation();
   const token = localStorage.getItem("token");
+    const role = (localStorage.getItem("role") || "") as Role;
     
 
     if (!token) {
     return <Navigate to={LOGIN_PATH} replace state={{ from: location }} />;
+  }
+    if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate to="/notfound" replace />;
   }
 
 
