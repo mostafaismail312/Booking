@@ -16,9 +16,10 @@ import {
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 
-import { ADMIN_URLS } from "../../../services/apiEndpoints";
+import { ADMIN_URLS, PORTAL_URLS } from "../../../services/apiEndpoints";
 import { axiosInstance } from "../../../services/axiosInstance";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 type ApiRoom = {
   _id: string;
@@ -61,7 +62,7 @@ function AdCard({
 }: {
   ad: ApiAd;
   variant: "large" | "small";
-  onFavourite: (adId: string) => void;
+  onFavourite: (roomId: string) => void; // ✅ roomId
   onView: (adId: string) => void;
 }) {
   const img = getImage(ad);
@@ -80,8 +81,7 @@ function AdCard({
       onClick={() => onView(ad._id)}
       sx={{
         position: "relative",
-        height:
-          variant === "large" ? { xs: 300, md: 420 } : { xs: 190, md: 200 },
+        height: variant === "large" ? { xs: 300, md: 420 } : { xs: 190, md: 200 },
         borderRadius: radius,
         overflow: "hidden",
         boxShadow: "0 18px 50px rgba(20,43,85,0.14)",
@@ -134,10 +134,11 @@ function AdCard({
           pointerEvents: hovered ? "auto" : "none",
         }}
       >
+        {/* ✅ Add to favourites uses roomId */}
         <IconButton
           onClick={(e) => {
             e.stopPropagation();
-            onFavourite(ad._id);
+            onFavourite(ad.room?._id);
           }}
           sx={{
             bgcolor: "rgba(255,255,255,0.25)",
@@ -216,8 +217,6 @@ export default function MostPopular() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
 
-
-
   // Dialog state
   const [loginOpen, setLoginOpen] = useState(false);
 
@@ -248,18 +247,40 @@ export default function MostPopular() {
   const first = ads[0];
   const rest = ads.slice(1, 5);
 
-  const handleFavourite = (adId: string) => {
+  // ✅ Add to favourites then navigate to favourites
+  const handleFavourite = async (roomId: string) => {
     if (!token) {
       setLoginOpen(true);
       return;
     }
 
+    if (!roomId) {
+      toast.error("Room not found");
+      return;
+    }
 
-    navigate("/fav-list"); 
+    try {
+    
+      await axiosInstance.post(PORTAL_URLS.ROOMS.ADD_TO_FAVORITES, { roomId });
+
+      toast.success("Added to favourites");
+      navigate("/fav-list");
+    } catch (e: any) {
+      const status = e?.response?.status;
+      if (status === 409) {
+        toast("Already in favourites");
+        navigate("/fav-list");
+        return;
+      }
+
+      toast.error("Failed to add to favourites");
+      console.error(e);
+    }
   };
+
   const handleView = (adId: string) => {
-  navigate(`/most-popular-details/${adId}`);
-};
+    navigate(`/most-popular-details/${adId}`);
+  };
 
   return (
     <Box sx={{ py: { xs: 4, md: 6 }, bgcolor: "#fff" }}>
@@ -286,21 +307,13 @@ export default function MostPopular() {
           {loading && (
             <Grid container spacing={3} alignItems="stretch">
               <Grid size={5}>
-                <Skeleton
-                  variant="rounded"
-                  height={420}
-                  sx={{ borderRadius: 3 }}
-                />
+                <Skeleton variant="rounded" height={420} sx={{ borderRadius: 3 }} />
               </Grid>
               <Grid size={7}>
                 <Grid container spacing={3}>
                   {Array.from({ length: 4 }).map((_, i) => (
                     <Grid key={i} size={6}>
-                      <Skeleton
-                        variant="rounded"
-                        height={200}
-                        sx={{ borderRadius: 3 }}
-                      />
+                      <Skeleton variant="rounded" height={200} sx={{ borderRadius: 3 }} />
                     </Grid>
                   ))}
                 </Grid>
