@@ -67,13 +67,13 @@ export default function RoomsExplore() {
           key={room._id}
           sx={{
             display: "flex",
-            justifyContent: "center", // 🔥 centers card in column
+            justifyContent: "center", 
           }}
         >
           <Box
             onClick={() => navigate(`/room-details/${room._id}`)}
             sx={{
-              width: 270, // 🔥 fixed card width
+              width: 350, 
               position: "relative",
               borderRadius: 3,
               overflow: "hidden",

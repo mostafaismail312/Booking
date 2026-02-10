@@ -98,7 +98,7 @@ export default function Register() {
                 cation
               </Typography>
 
-              <Typography variant="h4" sx={{ mt: '70px', ml: '90px', fontWeight: 'bold' }}>
+              <Typography variant="h4" sx={{ mt: '70px', ml: '90px', fontWeight: 'bold' }} >
                 Sign up
               </Typography>
 
@@ -108,8 +108,11 @@ export default function Register() {
               <Typography variant="h6" gutterBottom sx={{ color: 'darkred' }}>
                 <Typography component="span" variant="h6" sx={{ color: 'black', ml: '90px' }}>
                   You can
+                </Typography>
+                <Typography component="span" variant="h6" sx={{ ml: '10px' }}onClick={() => navigate("/login")}>
+                  Login here !
                 </Typography>{' '}
-                Login here !
+                
               </Typography>
 
               {/* Profile Image Dropzone */}
