@@ -41,7 +41,10 @@ const Item = styled(Paper)(({ theme }) => ({
 interface Room {
   _id: string;
   images: string[];
+  price: number;
+  discount: number;
 }
+
 
 export default function RoomDetails() {
   const { id } = useParams();
@@ -53,6 +56,8 @@ export default function RoomDetails() {
   const [feedbackText, setFeedbackText] = useState("");
   const [commentText, setCommentText] = useState("");
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const token = localStorage.getItem("token");
+  const isLoggedIn = !!token;
 
   // Booking states
   const [bookingRange, setBookingRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
@@ -132,8 +137,9 @@ export default function RoomDetails() {
 
   if (!room) return null;
 
-  const pricePerNight = 600;
-  const totalPrice = nights * pricePerNight;
+  const pricePerNight = room.price;
+  const discountedPrice =  room.discount;
+  const totalPrice = pricePerNight * nights - discountedPrice;
 
   return (
     <Container maxWidth="lg">
@@ -261,11 +267,14 @@ export default function RoomDetails() {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                   <Box>
                     <Typography variant="subtitle1" color="primary">
-                      $600 per night
+                      ${room.price} per night
                     </Typography>
-                    <Typography variant="subtitle1" color="red">
-                      Discount 20% Off
-                    </Typography>
+
+                    {room.discount > 0 && (
+                      <Typography variant="subtitle1" color="red">
+                        Discount ${room.discount}
+                      </Typography>
+                    )}
                   </Box>
 
                   {nights > 0 && (
@@ -321,31 +330,52 @@ export default function RoomDetails() {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                 <Typography variant="h6">Rate</Typography>
                 <Rating
-                  name="room-rating"
-                  value={ratingValue}
-                  onChange={(event, newValue) => setRatingValue(newValue)}
-                />
+                    name="room-rating"
+                    value={ratingValue}
+                    onChange={(event, newValue) => setRatingValue(newValue)}
+                    readOnly={!isLoggedIn}
+                  />
+
                 <TextField
-                  label="Your Feedback"
-                  multiline
-                  rows={4}
-                  value={feedbackText}
-                  onChange={(e) => setFeedbackText(e.target.value)}
-                  fullWidth
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': { borderColor: '#90caf9' },
-                      '&:hover fieldset': { borderColor: '#42a5f5' },
-                      '&.Mui-focused fieldset': {
-                        borderColor: '#1976d2',
-                        borderWidth: '2px',
-                      },
-                    },
-                  }}
-                />
-                <Button sx={{ width: '50%' }} variant="contained" color="primary">
+                    label="Your Feedback"
+                    multiline
+                    rows={4}
+                    value={feedbackText}
+                    onChange={(e) => setFeedbackText(e.target.value)}
+                    disabled={!isLoggedIn}
+                    fullWidth
+                    sx={{
+                                      '& .MuiOutlinedInput-root': {
+                                        '& fieldset': { borderColor: '#90caf9' },
+                                        '&:hover fieldset': { borderColor: '#42a5f5' },
+                                        '&.Mui-focused fieldset': {
+                                          borderColor: '#1976d2',
+                                          borderWidth: '2px',
+                                        },
+                                      },
+                                    }}
+                  />
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                <Button
+                  sx={{ width: "50%" }}
+                  variant="contained"
+                  color="primary"
+                  disabled={!isLoggedIn}
+                >
                   Rate
                 </Button>
+
+                {!isLoggedIn && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontStyle: "italic" }}
+                  >
+                    Please login to rate this room
+                  </Typography>
+                )}
+              </Box>
+
               </Box>
             </Grid>
 
@@ -394,7 +424,7 @@ export default function RoomDetails() {
                   }}
                 />
                 <Button
-                  sx={{ width: '50%' }}
+                  sx={{ width: '50%' , mb: 4}}
                   variant="contained"
                   color="primary"
                   onClick={handleSendComment}
