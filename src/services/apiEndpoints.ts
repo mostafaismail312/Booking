@@ -155,18 +155,14 @@ export const PORTAL_URLS = {
   },
 
   // Booking Endpoints within Portal
-  BOOKING: {
-    // Path to create a new booking by a portal user
-    CREATE_BOOKING: `${baseURL}/portal/Booking`,
-    // Path to get details of a specific booking by its ID for a portal user
-    GET_BOOKING: (id: string) => `${baseURL}/portal/Booking/${id}`,
-    // Path to update details of a specific booking by its ID for a portal user
-    UPDATE_BOOKING: (id: string) => `${baseURL}/portal/Booking/${id}`,
-    // Path to cancel a specific booking by its ID for a portal user
-    CANCEL_BOOKING: (id: string) => `${baseURL}/portal/Booking/${id}/cancel`,
-    // Path to get all bookings for the current portal user
-    GET_MY_BOOKINGS: `${baseURL}/portal/Booking/my-bookings`, // Assuming a dedicated endpoint for user's own bookings
-  },
+BOOKING: {
+  CREATE_BOOKING: `${baseURL}/portal/booking`,
+  GET_BOOKING: (id: string) => `${baseURL}/portal/booking/${id}`,
+  UPDATE_BOOKING: (id: string) => `${baseURL}/portal/booking/${id}`,
+  CANCEL_BOOKING: (id: string) => `${baseURL}/portal/booking/${id}/cancel`,
+  GET_MY_BOOKINGS: `${baseURL}/portal/booking/my-bookings`,
+  PAY: (id: string) => `${baseURL}/portal/booking/${id}/pay`,
+},
 
   // Ads Endpoints within Portal (if applicable for users to view)
   ADS: {

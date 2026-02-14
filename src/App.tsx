@@ -26,6 +26,8 @@ import LandingPage from "./shared/LandingPage/LandingPage";
 import MainLayout from "./shared/MainLayout/MainLayout";
 import Fav from "./templates/MasterLayoutTemplate/Fav/Fav";
 import MostPopulardetails from "./templates/MasterLayoutTemplate/MostPopular/MostPopulardetails";
+import Checkout from "./templates/MasterLayoutTemplate/Rooms/RoomsDetails/Checkout";
+
 
 function App() {
   const routes = createBrowserRouter([
@@ -102,7 +104,10 @@ function App() {
         { path: "room-details/:id", element: <RoomDetails /> },
         { path: "roomsexplore", element: <RoomsExplore /> },
         { path: "fav-list", element: <Fav /> },
-         { path: "/most-popular-details/:id", element: <MostPopulardetails /> },
+          { path: "checkout/:bookingId", element: <Checkout /> },
+         { path: "most-popular-details/:id", element: <MostPopulardetails /> },
+      
+
       ],
     },
   ]);
