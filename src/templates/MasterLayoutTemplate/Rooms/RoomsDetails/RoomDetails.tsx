@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import { styled } from "@mui/material/styles";
 import { Grid } from "@mui/material"; // ✅ زي ما طلبت (متغيرتش)
 import Paper from "@mui/material/Paper";
@@ -164,7 +165,7 @@ export default function RoomDetails() {
         {
           headers: {
             Authorization: `Bearer ${t}`,
-            token: t,
+            token: `Bearer ${t}`, // ✅ fixed
             "x-access-token": t,
           },
         }
@@ -238,45 +239,56 @@ export default function RoomDetails() {
 
       setIsBooking(true);
 
+      // ✅ FIX: remove roomId entirely (backend rejects it)
       const createPayload = {
         startDate: bookingRange[0].toDate().toISOString(),
         endDate: bookingRange[1].toDate().toISOString(),
-        room: id,
+        room: id, // ✅ only allowed key
         totalPrice: Number(totalPrice),
+      };
+
+      const headers = {
+        Authorization: `Bearer ${t}`,
+        token: `Bearer ${t}`,
+        "x-access-token": t,
       };
 
       const createRes = await axiosInstance.post(
         PORTAL_URLS.BOOKING.CREATE_BOOKING,
         createPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${t}`,
-            token: t,
-            "x-access-token": t,
-          },
-        }
+        { headers }
       );
 
       console.log("CREATE_BOOKING response FULL:", createRes.data);
 
-      const bookingId = createRes.data?.data?.booking?._id;
-      if (!bookingId) throw new Error("Booking id not found in create booking response");
+      const bookingId =
+        createRes.data?.data?.bookingId ||
+        createRes.data?.data?._id ||
+        createRes.data?.data?.booking?._id ||
+        createRes.data?.booking?._id ||
+        createRes.data?._id;
 
-      // ✅ go to checkout page
-    navigate(`/checkout/${bookingId}`, {
-  state: { totalPrice, nights },
-});
+      if (!bookingId) {
+        throw new Error("Booking id not found in create booking response");
+      }
+
+      navigate(`/checkout/${bookingId}`, {
+        state: { totalPrice, nights },
+      });
     } catch (e: any) {
-      console.error("CREATE_BOOKING ERROR status:", e?.response?.status);
-      console.error("CREATE_BOOKING ERROR data:", e?.response?.data);
-      console.error("CREATE_BOOKING ERROR message:", e?.message);
+      console.error("CREATE_BOOKING ERROR (raw):", e);
 
-      alert(
-        e?.response?.data?.message ||
-          (e?.response?.data ? JSON.stringify(e.response.data) : "") ||
-          e.message ||
-          "Failed to create booking"
-      );
+      if (axios.isAxiosError(e)) {
+        console.error("CREATE_BOOKING message:", e.message);
+        console.error("CREATE_BOOKING code:", e.code);
+        console.error("CREATE_BOOKING status:", e.response?.status);
+        console.error("CREATE_BOOKING data:", e.response?.data);
+        console.error("CREATE_BOOKING url:", e.config?.baseURL, e.config?.url);
+      } else {
+        console.error("Non-axios error:", e?.message);
+      }
+
+      alert(e?.response?.data?.message || e?.message || "Failed to create booking");
     } finally {
       setIsBooking(false);
     }
@@ -465,7 +477,12 @@ export default function RoomDetails() {
                   </Typography>
                 )}
 
-                <Button variant="contained" color="primary" disabled={!canBook} onClick={handleBook}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  disabled={!canBook}
+                  onClick={handleBook}
+                >
                   {isBooking ? <CircularProgress size={22} color="inherit" /> : "Book"}
                 </Button>
               </Paper>
@@ -510,7 +527,12 @@ export default function RoomDetails() {
                 />
 
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  <Button sx={{ width: "50%" }} variant="contained" color="primary" disabled={!isLoggedIn}>
+                  <Button
+                    sx={{ width: "50%" }}
+                    variant="contained"
+                    color="primary"
+                    disabled={!isLoggedIn}
+                  >
                     Rate
                   </Button>
 
@@ -523,7 +545,7 @@ export default function RoomDetails() {
               </Box>
             </Grid>
 
-            {/* Vertical line */}
+          
             <Grid
               sx={{
                 display: { xs: "none", md: "block" },

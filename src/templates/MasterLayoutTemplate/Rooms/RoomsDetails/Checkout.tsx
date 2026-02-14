@@ -6,33 +6,24 @@ import {
   Button,
   CircularProgress,
   Divider,
-  Paper,
   Stack,
   Typography,
 } from "@mui/material";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
 import { axiosInstance } from "../../../../services/axiosInstance";
 import { PORTAL_URLS } from "../../../../services/apiEndpoints";
 
 type Booking = {
   _id: string;
-  startDate?: string; // ISO
-  endDate?: string; // ISO
+  startDate?: string;
+  endDate?: string;
   totalPrice?: number;
-  room?: {
-    _id?: string;
-    roomNumber?: string;
-    price?: number;
-    discount?: number;
-    images?: string[];
-  };
+  room?: { roomNumber?: string };
 };
 
-function getJwtTokenOnly(): string {
+function getRawToken(): string {
   const keys = ["token", "accessToken", "authToken"];
   let raw = "";
 
@@ -45,32 +36,27 @@ function getJwtTokenOnly(): string {
   }
   if (!raw) return "";
 
-  // handle JSON stored token: {"token":"Bearer ..."} OR "\"Bearer ...\""
   try {
     const parsed = JSON.parse(raw);
     if (typeof parsed === "string") raw = parsed;
     else if (parsed?.token) raw = parsed.token;
     else if (parsed?.accessToken) raw = parsed.accessToken;
-  } catch {
-    // not JSON
-  }
+  } catch {}
 
   const cleaned = String(raw).replace(/^"+|"+$/g, "").trim();
   if (!cleaned) return "";
 
-  // return JWT only (no Bearer)
   return cleaned.replace(/^Bearer\s+/i, "").trim();
 }
 
-function buildAuthHeaders(jwt: string) {
-  // Many backends accept Authorization, some accept token, some accept x-access-token.
-  // Also: some expect token header to contain Bearer prefix.
-  const bearer = `Bearer ${jwt}`;
+function makeAuthHeaders() {
+  const t = getRawToken();
+  if (!t) return null;
 
   return {
-    Authorization: bearer,
-    token: bearer,
-    "x-access-token": bearer,
+    Authorization: `Bearer ${t}`,
+    token: `Bearer ${t}`,
+    "x-access-token": t,
   };
 }
 
@@ -83,17 +69,108 @@ function fmtDate(iso?: string) {
   }
 }
 
-function calcNights(start?: string, end?: string) {
-  if (!start || !end) return 0;
-  const s = new Date(start);
-  const e = new Date(end);
-  if (Number.isNaN(s.getTime()) || Number.isNaN(e.getTime())) return 0;
-  const ms = e.getTime() - s.getTime();
-  if (ms <= 0) return 0;
+function StepBubbles({ step }: { step: 1 | 2 | 3 }) {
+  const PRIMARY = "#1ABC9C";
 
-  // nights based on days difference (min 1)
-  const days = Math.ceil(ms / (1000 * 60 * 60 * 24));
-  return Math.max(1, days);
+  const isDone = (i: number) => i < step;
+  const isActive = (i: number) => i === step;
+
+  const Bubble = ({ i }: { i: 1 | 2 | 3 }) => {
+    const done = isDone(i);
+    const active = isActive(i);
+
+    if (done) {
+      return <CheckCircleRoundedIcon sx={{ fontSize: 36, color: PRIMARY }} />;
+    }
+
+    return (
+      <Box
+        sx={{
+          width: 36,
+          height: 36,
+          borderRadius: "50%",
+          border: "3px solid",
+          borderColor: active ? PRIMARY : "#cfd8dc",
+          display: "grid",
+          placeItems: "center",
+          color: active ? PRIMARY : "#90a4ae",
+          fontSize: 16,
+          fontWeight: 900,
+          bgcolor: "#fff",
+        }}
+      >
+        {i}
+      </Box>
+    );
+  };
+
+  const Line = ({ filled }: { filled: boolean }) => (
+    <Box
+      sx={{
+        width: 110,
+        height: 4,
+        bgcolor: filled ? PRIMARY : "#e3f2fd",
+        borderRadius: 999,
+      }}
+    />
+  );
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        mb: { xs: 3, md: 3.5 },
+      }}
+    >
+      <Bubble i={1} />
+      <Line filled={step > 1} />
+      <Bubble i={2} />
+      <Line filled={step > 2} />
+      <Bubble i={3} />
+    </Box>
+  );
+}
+
+
+function PageShell({ children }: { children: React.ReactNode }) {
+  return (
+    <Box
+      sx={{
+        minHeight: "100dvh",
+        width: "100%",
+        bgcolor: "#fff",
+        overflowX: "hidden",
+      }}
+    >
+      <Box
+        sx={{
+          minHeight: "100dvh",
+          width: "100%",
+          px: { xs: 2, sm: 3.5, md: 6 },
+          py: { xs: 2, md: 4 },
+          boxSizing: "border-box",
+        }}
+      >
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: 1280,
+            mx: "auto",
+            bgcolor: "#fff",
+            borderRadius: 2,
+            boxShadow: "0 10px 30px rgba(15, 23, 42, 0.06)",
+            border: "1px solid #eef2f7",
+            p: { xs: 2, md: 4 },
+            boxSizing: "border-box",
+          }}
+        >
+          {children}
+        </Box>
+      </Box>
+    </Box>
+  );
 }
 
 export default function Checkout() {
@@ -105,41 +182,32 @@ export default function Checkout() {
 
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loadingBooking, setLoadingBooking] = useState(true);
+
+  const [step, setStep] = useState<1 | 2 | 3>(2);
   const [paying, setPaying] = useState(false);
+  const [paid, setPaid] = useState(false);
 
-  // ✅ Success Dialog state
-  const [successOpen, setSuccessOpen] = useState(false);
-  const [successMsg, setSuccessMsg] = useState<string>("Payment succeeded ✅");
+  const headers = useMemo(() => makeAuthHeaders(), []);
+  const isLoggedIn = !!headers;
 
-  // ✅ read JWT once (no Bearer)
-  const jwt = useMemo(() => getJwtTokenOnly(), []);
-  const isLoggedIn = !!jwt;
-
-  // ✅ Fetch booking details
   useEffect(() => {
     const run = async () => {
-      if (!bookingId) {
-        setLoadingBooking(false);
-        return;
-      }
-
-      if (!jwt) {
+      if (!bookingId || !headers) {
         setLoadingBooking(false);
         return;
       }
 
       setLoadingBooking(true);
-
       try {
         const res = await axiosInstance.get(
           PORTAL_URLS.BOOKING.GET_BOOKING(bookingId),
-          { headers: buildAuthHeaders(jwt) }
+          { headers }
         );
 
         const b = res.data?.data?.booking || res.data?.data || res.data?.booking;
         setBooking(b ?? null);
       } catch (e: any) {
-        console.log("GET BOOKING DETAILS ERROR:", e?.response?.data || e?.message);
+        console.log("GET BOOKING ERROR:", e?.response?.data || e?.message);
         setBooking(null);
       } finally {
         setLoadingBooking(false);
@@ -147,47 +215,41 @@ export default function Checkout() {
     };
 
     run();
-  }, [bookingId, jwt]);
+  }, [bookingId, headers]);
 
-  const nights = calcNights(booking?.startDate, booking?.endDate);
   const totalToPay = booking?.totalPrice ?? 0;
 
   const canPay =
     !!bookingId &&
     isLoggedIn &&
-    !!booking &&
     !loadingBooking &&
     !paying &&
+    !paid &&
     !!stripe &&
     !!elements;
 
   const handlePay = async () => {
+    if (paying) return;
     if (!bookingId) return alert("Missing bookingId");
-    if (!jwt) return alert("Login token is missing — اعملي login تاني");
-    if (!stripe || !elements) return alert("Stripe not ready");
+    if (!headers) return alert("token is required - اعملي login تاني");
 
+    if (!stripe || !elements) return alert("Stripe not ready");
     const card = elements.getElement(CardElement);
     if (!card) return alert("Card element not found");
 
     setPaying(true);
 
     try {
-      // 1) Stripe tokenization -> tok_...
       const { token, error } = await stripe.createToken(card as any);
-
-      if (error || !token) {
+      if (error || !token)
         throw new Error(error?.message || "Failed to create stripe token");
-      }
 
-      // 2) Pay booking
-      // ✅ IMPORTANT: backend expects body { token: "tok_..." } (as per your Postman screenshot)
       const payRes = await axiosInstance.post(
         PORTAL_URLS.BOOKING.PAY(bookingId),
         { token: token.id },
-        { headers: buildAuthHeaders(jwt) }
+        { headers }
       );
 
-      // 3) Redirect if backend returns checkout url (optional flow)
       const payUrl =
         payRes.data?.data?.url ||
         payRes.data?.url ||
@@ -199,163 +261,258 @@ export default function Checkout() {
         return;
       }
 
-      // 4) No redirect URL -> treat as success (server-side charge/payment)
-      const status =
-        payRes.data?.data?.status ||
-        payRes.data?.status ||
-        payRes.data?.data?.paymentStatus;
-
-      setSuccessMsg(
-        status ? `Payment succeeded ✅ (status: ${status})` : "Payment succeeded ✅"
-      );
-      setSuccessOpen(true);
+      setPaid(true);
+      setStep(3);
     } catch (e: any) {
-      console.log("PAY ERROR:", e?.response?.data || e?.message);
-      alert(e?.response?.data?.message || e?.message || "Payment failed");
+      const msg = e?.response?.data?.message || e?.message || "Payment failed";
+
+      if (String(msg).includes("Stripe token more than once")) {
+        alert(
+          "retry pay"
+        );
+      } else {
+        alert(msg);
+      }
     } finally {
       setPaying(false);
     }
   };
 
+  if (!bookingId) {
+    return (
+      <PageShell>
+        <Typography color="error">Missing bookingId in URL</Typography>
+      </PageShell>
+    );
+  }
+
   return (
-    <Box sx={{ maxWidth: 900, mx: "auto", mt: 5, px: 2 }}>
-      <Stack spacing={2}>
-        <Typography variant="h5" fontWeight={700}>
-          Checkout
-        </Typography>
-
-        {!bookingId && (
-          <Paper sx={{ p: 2, border: "1px solid #eee" }}>
-            <Typography color="error">Missing bookingId in URL</Typography>
-          </Paper>
-        )}
-
-        {!isLoggedIn && (
-          <Paper sx={{ p: 2, border: "1px solid #eee" }}>
-            <Typography color="text.secondary">Please login first to continue.</Typography>
-          </Paper>
-        )}
-
-        {/* Booking Summary */}
-        <Paper sx={{ p: 2.5, border: "1px solid #eee" }}>
-          <Typography fontWeight={700} sx={{ mb: 1 }}>
-            Booking Summary
-          </Typography>
-
-          {loadingBooking ? (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              <CircularProgress size={20} />
-              <Typography color="text.secondary">Loading booking details…</Typography>
-            </Box>
-          ) : booking ? (
-            <Stack spacing={1}>
-              <Typography color="text.secondary">
-                Booking ID: <b>{bookingId}</b>
-              </Typography>
-
-              <Divider />
-
-              <Typography>
-                Start: <b>{fmtDate(booking.startDate)}</b>
-              </Typography>
-              <Typography>
-                End: <b>{fmtDate(booking.endDate)}</b>
-              </Typography>
-
-              <Typography>
-                Nights: <b>{nights || "--"}</b>
-              </Typography>
-
-              <Typography variant="h6" sx={{ mt: 1 }}>
-                Total to pay: <b>${totalToPay}</b>
-              </Typography>
-
-              {booking?.room?.roomNumber && (
-                <Typography color="text.secondary">
-                  Room: <b>{booking.room.roomNumber}</b>
-                </Typography>
-              )}
-            </Stack>
-          ) : (
-            <Typography color="error">
-              Could not load booking details. (Check endpoint + token)
-            </Typography>
-          )}
-        </Paper>
-
-        {/* Card + Pay */}
-        <Paper sx={{ p: 2.5, border: "1px solid #eee" }}>
-          <Typography fontWeight={700} sx={{ mb: 1 }}>
-            Payment Details
-          </Typography>
-
-          <Box
-            sx={{
-              border: "1px solid #ddd",
-              borderRadius: 2,
-              p: 2,
-              mb: 2,
-            }}
-          >
-            <CardElement options={{ hidePostalCode: true }} />
-          </Box>
-
+    <PageShell>
+      <Box sx={{ position: "relative" }}>
+        {/* Close */}
+        <Box sx={{ position: "absolute", right: 0, top: 0 }}>
           <Button
-            variant="contained"
-            onClick={handlePay}
-            disabled={!canPay}
-            sx={{ width: { xs: "100%", sm: 240 } }}
+            onClick={() => navigate("/")}
+            startIcon={<CloseRoundedIcon />}
+            sx={{ color: "#90a4ae" }}
           >
-            {paying ? <CircularProgress size={22} color="inherit" /> : "Pay"}
+            Close
           </Button>
+        </Box>
 
-          {!stripe || !elements ? (
-            <Typography sx={{ mt: 1.5 }} color="text.secondary">
-              Stripe is still initializing…
-            </Typography>
-          ) : null}
-        </Paper>
+        {/* Spacer so button doesn't overlap */}
+        <Box sx={{ pt: { xs: 4, md: 2 } }}>
+          <StepBubbles step={step} />
 
-        {/* ✅ Success Dialog */}
-        <Dialog
-          open={successOpen}
-          onClose={() => setSuccessOpen(false)}
-          maxWidth="xs"
-          fullWidth
-        >
-          <DialogTitle>Payment Successful</DialogTitle>
+          <Typography
+            variant="h4"
+            fontWeight={900}
+            textAlign="center"
+            sx={{ mb: 1 }}
+          >
+            Payment
+          </Typography>
 
-          <DialogContent>
-            <Typography sx={{ mt: 0.5 }} color="text.secondary">
-              {successMsg}
-            </Typography>
+          <Typography
+            textAlign="center"
+            color="text.secondary"
+            sx={{ mb: { xs: 3, md: 4 } }}
+          >
+            Kindly follow the instructions below
+          </Typography>
 
-            <Typography sx={{ mt: 1.5 }}>
-              Booking ID: <b>{bookingId}</b>
-            </Typography>
+          {step === 3 ? (
+            <Box sx={{ textAlign: "center", py: { xs: 3, md: 5 } }}>
+              <Typography variant="h5" fontWeight={900} sx={{ mb: 1 }}>
+                Yay! Completed
+              </Typography>
 
-            <Typography>
-              Total paid: <b>${totalToPay}</b>
-            </Typography>
-          </DialogContent>
+              <Typography color="text.secondary" sx={{ mb: 3 }}>
+                We will inform you via email later once the transaction has been accepted
+              </Typography>
 
-          <DialogActions>
-            <Button onClick={() => setSuccessOpen(false)}>Close</Button>
+           <Box
+  component="img"
+  src="/payment.png"
+  alt="Payment success illustration"
+  sx={{
+    width: { xs: 240, md: 340 },
+    height: { xs: 150, md: 210 },
+    mx: "auto",
+    mb: 3,
+    borderRadius: 3,
+    bgcolor: "#eef6ff",
+    border: "1px solid #e3f2fd",
+    objectFit: "cover", 
+    display: "block",
+  }}
+/>
 
-            <Button
-              variant="contained"
-              onClick={() => {
-                setSuccessOpen(false);
-                navigate("/roomsexplore");
-              }}
-            >
-              Back to Explore
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Stack>
-    </Box>
+              <Button
+                variant="contained"
+                onClick={() => navigate("/")}
+                sx={{ px: 5, borderRadius: 2 }}
+              >
+                Back to home
+              </Button>
+            </Box>
+          ) : (
+            <>
+              <Divider sx={{ mb: { xs: 3, md: 4 } }} />
+
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                  gap: { xs: 3, md: 6 },
+                  alignItems: "start",
+                  width: "100%",
+                  boxSizing: "border-box",
+                }}
+              >
+                {/* Left */}
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography fontWeight={900} sx={{ mb: 2 }}>
+                    Booking Summary
+                  </Typography>
+
+                  {loadingBooking ? (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                      <CircularProgress size={18} />
+                      <Typography color="text.secondary">
+                        Loading booking details…
+                      </Typography>
+                    </Box>
+                  ) : booking ? (
+                    <Stack spacing={1.2} sx={{ minWidth: 0 }}>
+                      <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{ wordBreak: "break-word" }}
+                      >
+                        Booking ID: <b>{bookingId}</b>
+                      </Typography>
+
+                      <Typography variant="body1">
+                        Start: <b>{fmtDate(booking.startDate)}</b>
+                      </Typography>
+
+                      <Typography variant="body1">
+                        End: <b>{fmtDate(booking.endDate)}</b>
+                      </Typography>
+
+                      {booking?.room?.roomNumber && (
+                        <Typography variant="body1" color="text.secondary">
+                          Room: <b>{booking.room.roomNumber}</b>
+                        </Typography>
+                      )}
+
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Total:
+                        </Typography>
+                        <Typography variant="h4" fontWeight={900}>
+                          ${totalToPay}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  ) : (
+                    <Typography color="error">
+                      Could not load booking details. (Check endpoint + token)
+                    </Typography>
+                  )}
+                </Box>
+
+                {/* Right */}
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography fontWeight={900} sx={{ mb: 2 }}>
+                    Payment Details
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      border: "1px solid #e2e8f0",
+                      borderRadius: 2,
+                      p: 2,
+                      mb: 2.5,
+                      bgcolor: "#fff",
+                      minWidth: 0,
+                    }}
+                  >
+                    <CardElement
+                      options={{
+                        hidePostalCode: true,
+                        style: {
+                          base: { fontSize: "16px" },
+                        },
+                      }}
+                    />
+                  </Box>
+
+                  {!isLoggedIn && (
+                    <Typography
+                      color="text.secondary"
+                      sx={{ mb: 1.5, fontStyle: "italic" }}
+                    >
+                      Please login first to continue.
+                    </Typography>
+                  )}
+
+                  {!stripe || !elements ? (
+                    <Typography color="text.secondary" sx={{ mb: 1.5 }}>
+                      Stripe is still initializing…
+                    </Typography>
+                  ) : null}
+
+                  <Button
+                    variant="contained"
+                    onClick={handlePay}
+                    disabled={!canPay}
+                    sx={{
+                      height: 48,
+                      borderRadius: 2,
+                      fontWeight: 900,
+                      width: "100%",
+                      fontSize: 16,
+                    }}
+                  >
+                    {paying ? (
+                      <CircularProgress size={22} color="inherit" />
+                    ) : (
+                      "Pay"
+                    )}
+                  </Button>
+
+                  <Button
+                    variant="text"
+                    onClick={() => navigate(-1)}
+                    sx={{
+                      mt: 1.5,
+                      color: "#90a4ae",
+                      fontWeight: 800,
+                      width: "100%",
+                      fontSize: 14,
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </Box>
+              </Box>
+
+              <Divider sx={{ mt: { xs: 3, md: 4 }, mb: 2 }} />
+
+              <Typography color="text.secondary" variant="body2">
+                Step 2: Enter card details and press Pay (press once).
+              </Typography>
+            </>
+          )}
+        </Box>
+      </Box>
+    </PageShell>
   );
 }
+
+
+
 
 
