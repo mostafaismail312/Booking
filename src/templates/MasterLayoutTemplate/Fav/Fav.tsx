@@ -28,9 +28,10 @@ export default function Fav() {
   useEffect(() => {
     getFavsList();
     console.log("hh" + favList);
-    
   }, []);
-
+  useEffect(() => {
+    console.log("favList updated 👉", favList);
+  }, [favList]);
   return (
     <>
       <Box sx={{ width: "80%", margin: "auto" }}>

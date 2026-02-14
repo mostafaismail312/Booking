@@ -58,6 +58,8 @@ export const FavoriteProvider = ({ children }: { children: React.ReactNode }) =>
       const response = await axiosInstance.get(PORTAL_URLS.ROOMS.GET_FAVORITE_ROOMS);
       const rooms = response.data.data.favoriteRooms?.[0]?.rooms || [];
       setFavList(rooms);
+      console.log(rooms);
+      
       setFavoriteIds(rooms.map((room: Room) => room._id));
     } catch (error) {
       console.error("Failed to fetch favorite rooms", error);

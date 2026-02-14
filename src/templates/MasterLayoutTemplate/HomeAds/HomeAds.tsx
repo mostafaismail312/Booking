@@ -137,7 +137,15 @@ export default function HomeAds() {
                   price={room.price}
                   isFirst={false}
                   gridStyles={{ width: "100%", height: 250, display: "flex" }}
-                  onClick={() => Navigate(`/rooms/${room._id}`)}
+                  onClick={() => Navigate(`/roomsexplore/${room._id}`)}
+                   isFavorite={favoriteIds.includes(room._id)}
+                  onToggleFavorite={(id) => {
+                    if (favoriteIds.includes(id)) {
+                      deleteFromFavs(id);
+                    } else {
+                      addToFavs(id);
+                    }
+                  }}
                 />
                 <Typography
                   color="#152C5B"
@@ -173,14 +181,6 @@ export default function HomeAds() {
           <Typography color="#152C5B" variant="h5" fontWeight={600}>
             Hotels with large living room
           </Typography>
-          {/* <MUILink 
-            underline="none"
-            sx={{ textDecoration: "none", color: "red", fontWeight: 500 }}
-            component={RouterLink}
-            to="/rooms"
-          >
-            more
-          </MUILink> */}
         </Box>
 
         <Swiper
@@ -251,14 +251,7 @@ export default function HomeAds() {
           <Typography color="#152C5B" variant="h5" fontWeight={600}>
             Houses with beauty backyard
           </Typography>
-          {/* <MUILink 
-            underline="none"
-            sx={{ textDecoration: "none", color: "red", fontWeight: 500 }}
-            component={RouterLink}
-            to="/rooms"
-          >
-            more
-          </MUILink> */}
+       
         </Box>
 
         <Swiper
@@ -285,7 +278,15 @@ export default function HomeAds() {
                   price={room.price}
                   isFirst={false}
                   gridStyles={{ width: "100%", height: 250, display: "flex" }}
-                  onClick={() => Navigate(`/rooms/${room._id}`)}
+                  onClick={() => Navigate(`/roomsexplore/${room._id}`)}
+                   isFavorite={favoriteIds.includes(room._id)}
+                  onToggleFavorite={(id) => {
+                    if (favoriteIds.includes(id)) {
+                      deleteFromFavs(id);
+                    } else {
+                      addToFavs(id);
+                    }
+                  }}
                 />
                 <Typography
                   color="#152C5B"
