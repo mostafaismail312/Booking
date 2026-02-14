@@ -108,17 +108,61 @@ export default function RoomDetails() {
   ]);
   const [nights, setNights] = useState<number>(0);
 
-  // ✅ Helper: resolve image URL
+  // ✅ Helper: resolve image URL (STRONG)
   const resolveImg = useMemo(() => {
-    const base = (axiosInstance.defaults.baseURL ?? "").replace(/\/$/, "");
+    const apiBase = axiosInstance.defaults.baseURL ?? "";
+
+    // origin = https://upskilling-egypt.com:3000
+    let origin = "";
+    try {
+      origin = apiBase ? new URL(apiBase).origin : window.location.origin;
+    } catch {
+      origin = window.location.origin;
+    }
+
     return (u?: string) => {
       if (!u) return "";
+
+      // full URL
       if (/^https?:\/\//i.test(u)) return u;
-      if (!base) return u;
-      const path = u.startsWith("/") ? u : `/${u}`;
-      return `${base}${path}`;
+
+      // clean ./ and spaces
+      const cleaned = String(u).trim().replace(/^\.\//, "");
+      const path = cleaned.startsWith("/") ? cleaned : `/${cleaned}`;
+
+      // api path
+      if (path.startsWith("/api/") || path.startsWith("/api/v0/")) {
+        return `${origin}${path}`;
+      }
+
+      // uploads path
+      if (path.startsWith("/uploads/") || path.startsWith("/upload/")) {
+        return `${origin}${path}`;
+      }
+
+      // images/static
+      if (path.startsWith("/images/") || path.startsWith("/static/")) {
+        return `${origin}${path}`;
+      }
+
+      // fallback
+      return `${origin}${path}`;
     };
   }, []);
+
+  // ✅ Placeholder replace if no image or failed to load
+  const PLACEHOLDER = "/forget.jpg";
+
+  const imgSrc = (u?: string) => {
+    const s = resolveImg(u);
+    return s ? s : PLACEHOLDER;
+  };
+
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const el = e.currentTarget;
+    if (el.src.includes(PLACEHOLDER)) return; // avoid loop
+    el.src = PLACEHOLDER;
+  };
 
   // ✅ Calculate nights (robust)
   useEffect(() => {
@@ -303,7 +347,8 @@ export default function RoomDetails() {
           <Grid item xs={12} md={6} sx={{ flexBasis: "45%", maxWidth: "45%", ml: "6%" }}>
             <Box
               component="img"
-              src={resolveImg(room.images?.[0])}
+              src={imgSrc(room.images?.[0])}
+              onError={handleImgError}
               alt="Room main"
               sx={{
                 width: "100%",
@@ -317,37 +362,35 @@ export default function RoomDetails() {
           {/* Right column images */}
           <Grid item xs={12} md={6} sx={{ flexBasis: "40%", maxWidth: "40%" }}>
             <Grid container spacing={2} direction="column" sx={{ height: "100%" }}>
-              {room.images?.[1] && (
-                <Grid item xs={12}>
-                  <Box
-                    component="img"
-                    src={resolveImg(room.images?.[1])}
-                    alt="Room view 1"
-                    sx={{
-                      width: "100%",
-                      height: 215,
-                      borderRadius: 2,
-                      objectFit: "cover",
-                    }}
-                  />
-                </Grid>
-              )}
+              <Grid item xs={12}>
+                <Box
+                  component="img"
+                  src={imgSrc(room.images?.[1])}
+                  onError={handleImgError}
+                  alt="Room view 1"
+                  sx={{
+                    width: "100%",
+                    height: 215,
+                    borderRadius: 2,
+                    objectFit: "cover",
+                  }}
+                />
+              </Grid>
 
-              {room.images?.[2] && (
-                <Grid item xs={12}>
-                  <Box
-                    component="img"
-                    src={resolveImg(room.images?.[2])}
-                    alt="Room view 2"
-                    sx={{
-                      width: "100%",
-                      height: 215,
-                      borderRadius: 2,
-                      objectFit: "cover",
-                    }}
-                  />
-                </Grid>
-              )}
+              <Grid item xs={12}>
+                <Box
+                  component="img"
+                  src={imgSrc(room.images?.[2])}
+                  onError={handleImgError}
+                  alt="Room view 2"
+                  sx={{
+                    width: "100%",
+                    height: 215,
+                    borderRadius: 2,
+                    objectFit: "cover",
+                  }}
+                />
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
@@ -477,12 +520,7 @@ export default function RoomDetails() {
                   </Typography>
                 )}
 
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={!canBook}
-                  onClick={handleBook}
-                >
+                <Button variant="contained" color="primary" disabled={!canBook} onClick={handleBook}>
                   {isBooking ? <CircularProgress size={22} color="inherit" /> : "Book"}
                 </Button>
               </Paper>
@@ -527,12 +565,7 @@ export default function RoomDetails() {
                 />
 
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  <Button
-                    sx={{ width: "50%" }}
-                    variant="contained"
-                    color="primary"
-                    disabled={!isLoggedIn}
-                  >
+                  <Button sx={{ width: "50%" }} variant="contained" color="primary" disabled={!isLoggedIn}>
                     Rate
                   </Button>
 
@@ -545,7 +578,7 @@ export default function RoomDetails() {
               </Box>
             </Grid>
 
-          
+            {/* Vertical line */}
             <Grid
               sx={{
                 display: { xs: "none", md: "block" },
@@ -615,3 +648,5 @@ export default function RoomDetails() {
     </Container>
   );
 }
+
+
