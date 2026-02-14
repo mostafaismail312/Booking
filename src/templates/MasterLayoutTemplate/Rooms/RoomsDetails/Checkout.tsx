@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import {
@@ -21,6 +21,9 @@ type Booking = {
   endDate?: string;
   totalPrice?: number;
   room?: { roomNumber?: string };
+  status?: string;
+  isPaid?: boolean;
+  paid?: boolean;
 };
 
 function getRawToken(): string {
@@ -133,7 +136,6 @@ function StepBubbles({ step }: { step: 1 | 2 | 3 }) {
   );
 }
 
-
 function PageShell({ children }: { children: React.ReactNode }) {
   return (
     <Box
@@ -187,8 +189,22 @@ export default function Checkout() {
   const [paying, setPaying] = useState(false);
   const [paid, setPaid] = useState(false);
 
+  type CompletionMode = "success" | "already_paid";
+  const [completionMode, setCompletionMode] =
+    useState<CompletionMode>("success");
+
+  const payLockRef = useRef(false);
+
   const headers = useMemo(() => makeAuthHeaders(), []);
   const isLoggedIn = !!headers;
+
+  const markAsPaidUI = (mode: CompletionMode = "success") => {
+    setCompletionMode(mode);
+    setPaid(true);
+    setStep(3);
+    setPaying(false);
+    payLockRef.current = false;
+  };
 
   useEffect(() => {
     const run = async () => {
@@ -206,6 +222,16 @@ export default function Checkout() {
 
         const b = res.data?.data?.booking || res.data?.data || res.data?.booking;
         setBooking(b ?? null);
+
+        const serverPaid =
+          b?.isPaid === true ||
+          b?.paid === true ||
+          String(b?.status || "").toLowerCase() === "paid" ||
+          String(b?.status || "").toLowerCase() === "completed";
+
+        if (serverPaid) {
+          markAsPaidUI("already_paid");
+        }
       } catch (e: any) {
         console.log("GET BOOKING ERROR:", e?.response?.data || e?.message);
         setBooking(null);
@@ -215,7 +241,8 @@ export default function Checkout() {
     };
 
     run();
-  }, [bookingId, headers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookingId]);
 
   const totalToPay = booking?.totalPrice ?? 0;
 
@@ -229,20 +256,39 @@ export default function Checkout() {
     !!elements;
 
   const handlePay = async () => {
-    if (paying) return;
-    if (!bookingId) return alert("Missing bookingId");
-    if (!headers) return alert("token is required - اعملي login تاني");
+    if (payLockRef.current) return;
+    payLockRef.current = true;
 
-    if (!stripe || !elements) return alert("Stripe not ready");
+    if (paying) {
+      payLockRef.current = false;
+      return;
+    }
+    if (!bookingId) {
+      payLockRef.current = false;
+      return alert("Missing bookingId");
+    }
+    if (!headers) {
+      payLockRef.current = false;
+      return alert("Token is required. Please log in again.");
+    }
+
+    if (!stripe || !elements) {
+      payLockRef.current = false;
+      return alert("Stripe is not ready yet.");
+    }
+
     const card = elements.getElement(CardElement);
-    if (!card) return alert("Card element not found");
+    if (!card) {
+      payLockRef.current = false;
+      return alert("Card element not found.");
+    }
 
     setPaying(true);
 
     try {
       const { token, error } = await stripe.createToken(card as any);
       if (error || !token)
-        throw new Error(error?.message || "Failed to create stripe token");
+        throw new Error(error?.message || "Failed to create Stripe token.");
 
       const payRes = await axiosInstance.post(
         PORTAL_URLS.BOOKING.PAY(bookingId),
@@ -260,21 +306,53 @@ export default function Checkout() {
         window.location.href = payUrl;
         return;
       }
-
-      setPaid(true);
-      setStep(3);
+console.log("payRes",payRes)
+      markAsPaidUI("success");
     } catch (e: any) {
-      const msg = e?.response?.data?.message || e?.message || "Payment failed";
+      const msg = String(e?.response?.data?.message || e?.message || "");
 
-      if (String(msg).includes("Stripe token more than once")) {
+      // Token reused / already paid scenarios
+      if (
+        msg.toLowerCase().includes("cannot use a stripe token more than once") ||
+        msg.toLowerCase().includes("already paid") ||
+        msg.toLowerCase().includes("already completed") ||
+        msg.toLowerCase().includes("payment has been completed")
+      ) {
         alert(
-          "retry pay"
+          "This booking appears to be already paid, or Pay was clicked more than once. Showing payment status now."
         );
-      } else {
-        alert(msg);
+
+        // Try to confirm from server
+        try {
+          const res = await axiosInstance.get(
+            PORTAL_URLS.BOOKING.GET_BOOKING(bookingId),
+            { headers }
+          );
+         
+          const b = res.data?.data?.booking || res.data?.data || res.data?.booking;
+          setBooking(b ?? null);
+
+          const serverPaid =
+            b?.isPaid === true ||
+            b?.paid === true ||
+            String(b?.status || "").toLowerCase() === "paid" ||
+            String(b?.status || "").toLowerCase() === "completed";
+
+          if (serverPaid) {
+            markAsPaidUI("already_paid");
+            return;
+          }
+        } catch {}
+
+        // Fallback UX if server doesn't confirm
+        markAsPaidUI("already_paid");
+        return;
       }
+
+      alert(msg || "Payment failed.");
     } finally {
       setPaying(false);
+      payLockRef.current = false;
     }
   };
 
@@ -289,7 +367,6 @@ export default function Checkout() {
   return (
     <PageShell>
       <Box sx={{ position: "relative" }}>
-        {/* Close */}
         <Box sx={{ position: "absolute", right: 0, top: 0 }}>
           <Button
             onClick={() => navigate("/")}
@@ -300,53 +377,50 @@ export default function Checkout() {
           </Button>
         </Box>
 
-        {/* Spacer so button doesn't overlap */}
         <Box sx={{ pt: { xs: 4, md: 2 } }}>
           <StepBubbles step={step} />
 
-          <Typography
-            variant="h4"
-            fontWeight={900}
-            textAlign="center"
-            sx={{ mb: 1 }}
-          >
+          <Typography variant="h4" fontWeight={900} textAlign="center" sx={{ mb: 1 }}>
             Payment
           </Typography>
 
-          <Typography
-            textAlign="center"
-            color="text.secondary"
-            sx={{ mb: { xs: 3, md: 4 } }}
-          >
-            Kindly follow the instructions below
+          <Typography textAlign="center" color="text.secondary" sx={{ mb: { xs: 3, md: 4 } }}>
+            Kindly follow the instructions below.
           </Typography>
 
           {step === 3 ? (
             <Box sx={{ textAlign: "center", py: { xs: 3, md: 5 } }}>
               <Typography variant="h5" fontWeight={900} sx={{ mb: 1 }}>
-                Yay! Completed
+                {completionMode === "already_paid"
+                  ? "Payment Already Completed ✅"
+                  : "Payment Successful ✅"}
               </Typography>
 
               <Typography color="text.secondary" sx={{ mb: 3 }}>
-                We will inform you via email later once the transaction has been accepted
+                {completionMode === "already_paid"
+                  ? "It looks like this booking has already been paid, so there is no need to pay again."
+                  : "We received your payment. We will confirm the final status by email once the transaction is accepted."}
               </Typography>
 
-           <Box
-  component="img"
-  src="/payment.png"
-  alt="Payment success illustration"
-  sx={{
-    width: { xs: 240, md: 340 },
-    height: { xs: 150, md: 210 },
-    mx: "auto",
-    mb: 3,
-    borderRadius: 3,
-    bgcolor: "#eef6ff",
-    border: "1px solid #e3f2fd",
-    objectFit: "cover", 
-    display: "block",
-  }}
-/>
+              <Box
+                component="img"
+                src={completionMode === "already_paid" ? "/paid-already.png" : "/payment.png"}
+                alt="Payment illustration"
+                sx={{
+                  width: { xs: 240, md: 340 },
+                  height: { xs: 150, md: 210 },
+                  mx: "auto",
+                  mb: 3,
+                  borderRadius: 3,
+                  bgcolor: "#eef6ff",
+                  border: "1px solid #e3f2fd",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = "/payment.png";
+                }}
+              />
 
               <Button
                 variant="contained"
@@ -370,7 +444,6 @@ export default function Checkout() {
                   boxSizing: "border-box",
                 }}
               >
-                {/* Left */}
                 <Box sx={{ minWidth: 0 }}>
                   <Typography fontWeight={900} sx={{ mb: 2 }}>
                     Booking Summary
@@ -423,7 +496,6 @@ export default function Checkout() {
                   )}
                 </Box>
 
-                {/* Right */}
                 <Box sx={{ minWidth: 0 }}>
                   <Typography fontWeight={900} sx={{ mb: 2 }}>
                     Payment Details
@@ -454,7 +526,7 @@ export default function Checkout() {
                       color="text.secondary"
                       sx={{ mb: 1.5, fontStyle: "italic" }}
                     >
-                      Please login first to continue.
+                      Please log in first to continue.
                     </Typography>
                   )}
 
@@ -511,6 +583,9 @@ export default function Checkout() {
     </PageShell>
   );
 }
+
+
+
 
 
 
