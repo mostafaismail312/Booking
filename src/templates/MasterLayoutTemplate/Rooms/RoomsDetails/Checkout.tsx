@@ -198,12 +198,37 @@ export default function Checkout() {
   const headers = useMemo(() => makeAuthHeaders(), []);
   const isLoggedIn = !!headers;
 
-  const markAsPaidUI = (mode: CompletionMode = "success") => {
+  // ✅ Always open from TOP (no auto-scroll to Step 2)
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+
+    return () => {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "auto";
+      }
+    };
+  }, [bookingId]);
+
+  const markAsPaidUI = (mode: CompletionMode) => {
     setCompletionMode(mode);
     setPaid(true);
     setStep(3);
     setPaying(false);
     payLockRef.current = false;
+  };
+
+  const isServerPaid = (b: any) => {
+    if (!b) return false;
+    return (
+      b?.isPaid === true ||
+      b?.paid === true ||
+      String(b?.status || "").toLowerCase() === "paid" ||
+      String(b?.status || "").toLowerCase() === "completed"
+    );
   };
 
   useEffect(() => {
@@ -223,13 +248,8 @@ export default function Checkout() {
         const b = res.data?.data?.booking || res.data?.data || res.data?.booking;
         setBooking(b ?? null);
 
-        const serverPaid =
-          b?.isPaid === true ||
-          b?.paid === true ||
-          String(b?.status || "").toLowerCase() === "paid" ||
-          String(b?.status || "").toLowerCase() === "completed";
-
-        if (serverPaid) {
+        // If already paid -> go Step 3 with "already paid" message
+        if (isServerPaid(b)) {
           markAsPaidUI("already_paid");
         }
       } catch (e: any) {
@@ -265,11 +285,17 @@ export default function Checkout() {
     }
     if (!bookingId) {
       payLockRef.current = false;
-      return alert("Missing bookingId");
+      return alert("Missing bookingId.");
     }
     if (!headers) {
       payLockRef.current = false;
       return alert("Token is required. Please log in again.");
+    }
+
+    // Optional: if booking already paid in UI state, prevent extra calls
+    if (isServerPaid(booking)) {
+      markAsPaidUI("already_paid");
+      return;
     }
 
     if (!stripe || !elements) {
@@ -287,8 +313,9 @@ export default function Checkout() {
 
     try {
       const { token, error } = await stripe.createToken(card as any);
-      if (error || !token)
+      if (error || !token) {
         throw new Error(error?.message || "Failed to create Stripe token.");
+      }
 
       const payRes = await axiosInstance.post(
         PORTAL_URLS.BOOKING.PAY(bookingId),
@@ -296,6 +323,7 @@ export default function Checkout() {
         { headers }
       );
 
+      // Sometimes backend might return redirect URL
       const payUrl =
         payRes.data?.data?.url ||
         payRes.data?.url ||
@@ -306,50 +334,43 @@ export default function Checkout() {
         window.location.href = payUrl;
         return;
       }
-console.log("payRes",payRes)
+
+      // If backend returns success and booking object, treat as paid
       markAsPaidUI("success");
     } catch (e: any) {
-      const msg = String(e?.response?.data?.message || e?.message || "");
+      const msg = String(e?.response?.data?.message || e?.message || "Payment failed.");
 
-      // Token reused / already paid scenarios
-      if (
-        msg.toLowerCase().includes("cannot use a stripe token more than once") ||
-        msg.toLowerCase().includes("already paid") ||
-        msg.toLowerCase().includes("already completed") ||
-        msg.toLowerCase().includes("payment has been completed")
-      ) {
-        alert(
-          "This booking appears to be already paid, or Pay was clicked more than once. Showing payment status now."
-        );
+      // Token reuse / already paid / completed
+      const lower = msg.toLowerCase();
+      const looksLikeAlreadyPaid =
+        lower.includes("cannot use a stripe token more than once") ||
+        lower.includes("already paid") ||
+        lower.includes("already completed") ||
+        lower.includes("payment has been completed");
 
-        // Try to confirm from server
+      if (looksLikeAlreadyPaid) {
+        // Re-check booking status from server: if paid -> show step 3 already paid
         try {
           const res = await axiosInstance.get(
             PORTAL_URLS.BOOKING.GET_BOOKING(bookingId),
             { headers }
           );
-         
           const b = res.data?.data?.booking || res.data?.data || res.data?.booking;
           setBooking(b ?? null);
 
-          const serverPaid =
-            b?.isPaid === true ||
-            b?.paid === true ||
-            String(b?.status || "").toLowerCase() === "paid" ||
-            String(b?.status || "").toLowerCase() === "completed";
-
-          if (serverPaid) {
+          if (isServerPaid(b)) {
             markAsPaidUI("already_paid");
             return;
           }
-        } catch {}
+        } catch {
+          // ignore and still show already paid (UX)
+        }
 
-        // Fallback UX if server doesn't confirm
         markAsPaidUI("already_paid");
         return;
       }
 
-      alert(msg || "Payment failed.");
+      alert(msg);
     } finally {
       setPaying(false);
       payLockRef.current = false;
@@ -367,6 +388,7 @@ console.log("payRes",payRes)
   return (
     <PageShell>
       <Box sx={{ position: "relative" }}>
+        {/* Close */}
         <Box sx={{ position: "absolute", right: 0, top: 0 }}>
           <Button
             onClick={() => navigate("/")}
@@ -377,6 +399,7 @@ console.log("payRes",payRes)
           </Button>
         </Box>
 
+        {/* Spacer so button doesn't overlap */}
         <Box sx={{ pt: { xs: 4, md: 2 } }}>
           <StepBubbles step={step} />
 
@@ -398,8 +421,8 @@ console.log("payRes",payRes)
 
               <Typography color="text.secondary" sx={{ mb: 3 }}>
                 {completionMode === "already_paid"
-                  ? "It looks like this booking has already been paid, so there is no need to pay again."
-                  : "We received your payment. We will confirm the final status by email once the transaction is accepted."}
+                  ? "This booking has already been paid. You do not need to pay again."
+                  : "We received your payment. You will receive an email once the transaction is confirmed."}
               </Typography>
 
               <Box
@@ -444,6 +467,7 @@ console.log("payRes",payRes)
                   boxSizing: "border-box",
                 }}
               >
+                {/* Left */}
                 <Box sx={{ minWidth: 0 }}>
                   <Typography fontWeight={900} sx={{ mb: 2 }}>
                     Booking Summary
@@ -496,6 +520,7 @@ console.log("payRes",payRes)
                   )}
                 </Box>
 
+                {/* Right */}
                 <Box sx={{ minWidth: 0 }}>
                   <Typography fontWeight={900} sx={{ mb: 2 }}>
                     Payment Details
@@ -514,9 +539,7 @@ console.log("payRes",payRes)
                     <CardElement
                       options={{
                         hidePostalCode: true,
-                        style: {
-                          base: { fontSize: "16px" },
-                        },
+                        style: { base: { fontSize: "16px" } },
                       }}
                     />
                   </Box>
@@ -583,11 +606,4 @@ console.log("payRes",payRes)
     </PageShell>
   );
 }
-
-
-
-
-
-
-
 
