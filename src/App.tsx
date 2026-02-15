@@ -100,7 +100,9 @@ function App() {
       children: [
         { index: true, element: <LandingPage /> },
         { path: "landing-page", element: <LandingPage /> },
-        
+
+       { path: "rooms", element: <RoomsExplore /> },
+
         { path: "room-details/:id", element: <RoomDetails /> },
         { path: "roomsexplore", element: <RoomsExplore /> },
         { path: "fav-list", element: <Fav /> },
