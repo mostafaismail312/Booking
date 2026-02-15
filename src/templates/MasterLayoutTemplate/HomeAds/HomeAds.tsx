@@ -7,10 +7,68 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { ROOM_DETAILS_PATH } from "../../../services/paths";
 import { Navigate, useNavigate } from "react-router-dom";
 import ImageCard from "./ImageCard";
+import { useFavorite } from "../../../context/FavoriteContext/FavoriteContext";
+import toast from "react-hot-toast";
 
 export default function HomeAds() {
   const [adsData, setAdsData] = useState<[]>([]);
   const Navigate = useNavigate();
+  const { refreshFavorites } = useFavorite();
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  /* ========== get all favs to render the favlist comp ==========  */
+
+  const getFavoriteRooms = async () => {
+    try {
+      const response = await axiosInstance.get(
+        PORTAL_URLS.ROOMS.GET_FAVORITE_ROOMS,
+      );
+      const rooms = response.data.data.favoriteRooms?.[0]?.rooms || [];
+      const ids = rooms.map((room: Room ) => room._id);
+      setFavoriteIds(ids);
+    } catch (error) {
+      console.error("Failed to fetch favorites", error);
+    }
+  };
+  /* ========== add to favs========== */
+
+  const addToFavs = async (roomId: string) => {
+    try {
+      const response = await axiosInstance.post(
+        PORTAL_URLS.ROOMS.ADD_TO_FAVORITES,
+        { roomId },
+      );
+      setFavoriteIds((prev) => [...prev, roomId]); //  Update state
+      toast.success(response?.data?.message || "Room added to favorites.");
+      refreshFavorites();
+      console.log(response);
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Failed to add to favorites.",
+      );
+      console.error(error);
+    }
+  };
+  /* ========== remove from favs========== */
+
+  const deleteFromFavs = async (roomId: string) => {
+    try {
+      const response = await axiosInstance.delete(
+        PORTAL_URLS.ROOMS.REMOVE_FROM_FAVORITES(roomId),
+        {
+          data: { roomId }, //  Send in body!
+        },
+      );
+
+      setFavoriteIds((prev) => prev.filter((id) => id !== roomId)); // search by ID
+      toast.success(response?.data?.message || "Room removed from favorites.");
+      refreshFavorites();
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Failed to remove from favorites.",
+      );
+      console.error(error);
+    }
+  };
 
   /* =============== get ads all  ========================== */
 
@@ -52,14 +110,7 @@ export default function HomeAds() {
           <Typography color="#152C5B" variant="h5" fontWeight={600}>
             Houses with beauty backyard
           </Typography>
-          {/* <MUILink 
-            underline="none"
-            sx={{ textDecoration: "none", color: "red", fontWeight: 500 }}
-            component={RouterLink}
-            to="/rooms"
-          >
-            more
-          </MUILink> */}
+         
         </Box>
 
         <Swiper
@@ -86,7 +137,85 @@ export default function HomeAds() {
                   price={room.price}
                   isFirst={false}
                   gridStyles={{ width: "100%", height: 250, display: "flex" }}
-                  onClick={() => Navigate(`/rooms/${room._id}`)}
+                  onClick={() => Navigate(`/roomsexplore/${room._id}`)}
+                   isFavorite={favoriteIds.includes(room._id)}
+                  onToggleFavorite={(id) => {
+                    if (favoriteIds.includes(id)) {
+                      deleteFromFavs(id);
+                    } else {
+                      addToFavs(id);
+                    }
+                  }}
+                />
+                <Typography
+                  color="#152C5B"
+                  fontWeight={600}
+                  fontSize={16}
+                  mt={1} 
+                >
+                  {room.roomNumber}
+                </Typography>
+                <Typography variant="body2" color="#C7C7C7">
+                  item location
+                </Typography>
+              </SwiperSlide>
+            );
+          })}
+        </Swiper>
+      </Box>
+
+      {/* Houses with Beauty Backyard Section */}
+      <Box
+        mt={8}
+        sx={{
+          width: "90%",
+          mx: "auto",
+        }}
+      >
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
+          <Typography color="#152C5B" variant="h5" fontWeight={600}>
+            Hotels with large living room
+          </Typography>
+        </Box>
+
+        <Swiper
+          spaceBetween={16}
+          slidesPerView={4}
+          autoplay={{ delay: 2000, disableOnInteraction: true }}
+          modules={[Autoplay]}
+          style={{ width: "100%" }}
+          breakpoints={{
+            0: { slidesPerView: 1 },
+            600: { slidesPerView: 2 },
+            960: { slidesPerView: 3 },
+            1280: { slidesPerView: 4 },
+          }}
+        >
+          {adsData.map((ad) => {
+            const room = ad.room;
+            return (
+              <SwiperSlide key={room._id}>
+                <ImageCard
+                  roomId={room._id}
+                  image={room.images?.[0]}
+                  title={""}
+                  price={room.price}
+                  isFirst={false}
+                  gridStyles={{ width: "100%", height: 250, display: "flex" }}
+                  onClick={() => Navigate(`/room-details/${room._id}`)}
+                  isFavorite={favoriteIds.includes(room._id)}
+                  onToggleFavorite={(id) => {
+                    if (favoriteIds.includes(id)) {
+                      deleteFromFavs(id);
+                    } else {
+                      addToFavs(id);
+                    }
+                  }}
                 />
                 <Typography
                   color="#152C5B"
@@ -122,14 +251,7 @@ export default function HomeAds() {
           <Typography color="#152C5B" variant="h5" fontWeight={600}>
             Houses with beauty backyard
           </Typography>
-          {/* <MUILink 
-            underline="none"
-            sx={{ textDecoration: "none", color: "red", fontWeight: 500 }}
-            component={RouterLink}
-            to="/rooms"
-          >
-            more
-          </MUILink> */}
+       
         </Box>
 
         <Swiper
@@ -156,77 +278,15 @@ export default function HomeAds() {
                   price={room.price}
                   isFirst={false}
                   gridStyles={{ width: "100%", height: 250, display: "flex" }}
-                  onClick={() => Navigate(`/rooms/${room._id}`)}
-                />
-                <Typography
-                  color="#152C5B"
-                  fontWeight={600}
-                  fontSize={16}
-                  mt={1}
-                >
-                  {room.roomNumber}
-                </Typography>
-                <Typography variant="body2" color="#C7C7C7">
-                  item location
-                </Typography>
-              </SwiperSlide>
-            );
-          })}
-        </Swiper>
-      </Box>
-
-      {/* Houses with Beauty Backyard Section */}
-      <Box
-        mt={8}
-        sx={{
-          width: "90%",
-          mx: "auto",
-        }}
-      >
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
-        >
-          <Typography color="#152C5B" variant="h5" fontWeight={600}>
-            Houses with beauty backyard
-          </Typography>
-          {/* <MUILink 
-            underline="none"
-            sx={{ textDecoration: "none", color: "red", fontWeight: 500 }}
-            component={RouterLink}
-            to="/rooms"
-          >
-            more
-          </MUILink> */}
-        </Box>
-
-        <Swiper
-          spaceBetween={16}
-          slidesPerView={4}
-          autoplay={{ delay: 2000, disableOnInteraction: true }}
-          modules={[Autoplay]}
-          style={{ width: "100%" }}
-          breakpoints={{
-            0: { slidesPerView: 1 },
-            600: { slidesPerView: 2 },
-            960: { slidesPerView: 3 },
-            1280: { slidesPerView: 4 },
-          }}
-        >
-          {adsData.map((ad) => {
-            const room = ad.room;
-            return (
-              <SwiperSlide key={room._id}>
-                <ImageCard
-                  roomId={room._id}
-                  image={room.images?.[0]}
-                  title={""}
-                  price={room.price}
-                  isFirst={false}
-                  gridStyles={{ width: "100%", height: 250, display: "flex" }}
-                  onClick={() => Navigate(`/rooms/${room._id}`)}
+                  onClick={() => Navigate(`/roomsexplore/${room._id}`)}
+                   isFavorite={favoriteIds.includes(room._id)}
+                  onToggleFavorite={(id) => {
+                    if (favoriteIds.includes(id)) {
+                      deleteFromFavs(id);
+                    } else {
+                      addToFavs(id);
+                    }
+                  }}
                 />
                 <Typography
                   color="#152C5B"
