@@ -48,22 +48,20 @@ export const ADMIN_URLS = {
 
   // Booking Management Endpoints within Admin
   BOOKING: {
-    // Path to create a new booking (admin can create bookings)
-    CREATE_BOOKING: "/admin/Booking",
-    // Path to get details of a specific booking by its ID (admin view)
+     CREATE_BOOKING: `${baseURL}/admin/booking`,
     GET_BOOKING: (id: string): string => `${baseURL}/admin/booking/${id}`,
+    DELETE_BOOKING: (id: string) => `${baseURL}/admin/booking/${id}`,
+    GET_ALL_BOOKINGS: `${baseURL}/admin/booking`,
+
     // Path to update details of a specific booking by its ID (admin view)
     UPDATE_BOOKING: (id: number): string => `${baseURL}/admin/Booking/${id}`,
     // Path to cancel a specific booking by its ID (admin view)
     CANCEL_BOOKING: (id: number): string =>
-      `${baseURL}/admin/Booking/${id}/cancel`,
-    // Path to delete a specific booking by its ID (admin view)
-    DELETE_BOOKING: (id: string) => `${baseURL}/admin/booking/${id}`,
-    // Path to get all bookings (admin view, with filtering/pagination)
-    GET_ALL_BOOKINGS: "/admin/Booking",
+      `${baseURL}/admin/booking/${id}/cancel`,
+  
     // Path to confirm a specific booking (admin action)
     CONFIRM_BOOKING: (id: number): string =>
-      `${baseURL}/admin/Booking/${id}/confirm`,
+      `${baseURL}/admin/booking/${id}/confirm`,
   },
 
   // Ads Management Endpoints within Admin

@@ -138,7 +138,7 @@ export default function Users() {
           border: "1px solid",
           borderColor: "divider",
           overflow: "hidden",
-          bgcolor: "background.paper",
+          bgcolor: "#000",
         }}
       >
         <Box
