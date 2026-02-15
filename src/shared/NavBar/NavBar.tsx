@@ -19,7 +19,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useEffect, useState } from "react";
 import logoMain from "/color-logo-Ci_5FMX-.svg";
 // import { useFavorite } from "@/store/AuthContext/FavoriteContext";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 // import { Link as MUILink } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -44,6 +44,7 @@ const Navbar = () => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   //   const { favoriteItemsCount, refreshFavorites } = useFavorite(); //  get count and refresh
   const { fullUserData, logOutUser, loginData } = useAuth();
+  const navigate = useNavigate();
 
   const userName = fullUserData?.userName || "Guest";
   const userAvatar = fullUserData?.profileImage || "/images/default-avatar.jpg";
@@ -78,6 +79,7 @@ const Navbar = () => {
         }
       });
   };
+
   useEffect(() => {
     // refreshFavorites();
     const timeout = setTimeout(() => {
@@ -86,6 +88,24 @@ const Navbar = () => {
 
     return () => clearTimeout(timeout);
   }, []);
+
+  // ✅ Hover style for desktop nav links
+  const navLinkSx = {
+    textDecoration: "none",
+    color: "#152C5B",
+    fontWeight: 500,
+    transition: "color .2s ease",
+    "&:hover": {
+      color: "#3252DF",
+    },
+  };
+
+  // ✅ Hover style for drawer items
+  const drawerItemSx = {
+    "&:hover .MuiListItemText-primary": {
+      color: "#3252DF",
+    },
+  };
 
   return (
     <>
@@ -147,40 +167,21 @@ const Navbar = () => {
                     component={RouterLink}
                     to="/"
                     sx={{
-                      textDecoration: "none",
-                      color: "#3252DF",
-                      fontWeight: 500,
+                      ...navLinkSx,
+                      color: "#3252DF", // keep Home blue by default
                     }}
                   >
                     Home
                   </Typography>
 
-                  {/* Exlpore */}
-
-                  <Typography
-                    component={RouterLink}
-                    to="/rooms"
-                    sx={{
-                      textDecoration: "none",
-                      color: "#152C5B",
-                      fontWeight: 500,
-                    }}
-                  >
+                  {/* Explore */}
+                  <Typography component={RouterLink} to="/roomsexplore" sx={navLinkSx}>
                     Explore
                   </Typography>
 
                   {/* Reviews */}
-
                   {localStorage.getItem("token") && loginData ? (
-                    <Typography
-                      component={RouterLink}
-                      to=""
-                      sx={{
-                        textDecoration: "none",
-                        color: "#152C5B",
-                        fontWeight: 500,
-                      }}
-                    >
+                    <Typography component={RouterLink} to="" sx={navLinkSx}>
                       Reviews
                     </Typography>
                   ) : (
@@ -194,6 +195,7 @@ const Navbar = () => {
                         textTransform: "none",
                         fontWeight: "100",
                         px: "25px",
+                        "&:hover": { bgcolor: "#3252DF" },
                       }}
                     >
                       Regsiter
@@ -318,14 +320,17 @@ const Navbar = () => {
                   component={RouterLink}
                   to="/"
                   onClick={() => setDrawerOpen(false)}
+                  sx={drawerItemSx}
                 >
                   <ListItemText primary="Home" />
                 </ListItemButton>
 
                 <ListItemButton
-                  component={RouterLink}
-                  to="/rooms"
-                  onClick={() => setDrawerOpen(false)}
+                  sx={drawerItemSx}
+                  onClick={() => {
+                    navigate("/roomsexplore");
+                    setDrawerOpen(false);
+                  }}
                 >
                   <ListItemText primary="Explore" />
                 </ListItemButton>
@@ -334,6 +339,7 @@ const Navbar = () => {
                   component={RouterLink}
                   to=""
                   onClick={() => setDrawerOpen(false)}
+                  sx={drawerItemSx}
                 >
                   <ListItemText primary="Reviews" />
                 </ListItemButton>
@@ -342,6 +348,7 @@ const Navbar = () => {
                   component={RouterLink}
                   to="/fav-list"
                   onClick={() => setDrawerOpen(false)}
+                  sx={drawerItemSx}
                 >
                   <ListItemText primary="Favorites" />
                   {/* <Badge
@@ -362,7 +369,11 @@ const Navbar = () => {
                     <Typography variant="body2">Welcome: {userName}</Typography>
                     <Typography
                       variant="body2"
-                      sx={{ color: "blue", cursor: "pointer" }}
+                      sx={{
+                        color: "blue",
+                        cursor: "pointer",
+                        "&:hover": { color: "#3252DF" },
+                      }}
                       onClick={() => {
                         setDrawerOpen(false);
                         handleLogoutBtn();
@@ -382,3 +393,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
