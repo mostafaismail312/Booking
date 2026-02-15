@@ -76,7 +76,6 @@ export default function Appbar() {
 
         setProfile(p);
 
-        // اختياري: تحديث الاسم في localStorage
         if (p?.userName) localStorage.setItem("userName", p.userName);
       } catch (err) {
         console.error("Error fetching profile:", err);

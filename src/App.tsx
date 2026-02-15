@@ -27,6 +27,7 @@ import MainLayout from "./shared/MainLayout/MainLayout";
 import Fav from "./templates/MasterLayoutTemplate/Fav/Fav";
 import MostPopulardetails from "./templates/MasterLayoutTemplate/MostPopular/MostPopulardetails";
 import Checkout from "./templates/MasterLayoutTemplate/Rooms/RoomsDetails/Checkout";
+import BookingList from "./templates/DashboardTemplate/Bookings/BookingList/BookingList";
 
 
 function App() {
@@ -72,6 +73,7 @@ function App() {
         { index: true, element: <Home /> },
         { path: "home", element: <Home /> },
         { path: "rooms", element: <RoomList /> },
+         { path: "bookings", element: <BookingList/> },
 
         { path: "createroom", element: <CreateRoom /> },
         { path: "edit/:id", element: <CreateRoom /> },
