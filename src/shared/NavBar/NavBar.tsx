@@ -161,7 +161,7 @@ const Navbar = () => {
 
                   <Typography
                     component={RouterLink}
-                    to="/rooms"
+                    to="/roomsexplore"
                     sx={{
                       textDecoration: "none",
                       color: "#152C5B",
@@ -326,7 +326,7 @@ const Navbar = () => {
 
                 <ListItemButton
                   component={RouterLink}
-                  to="/rooms"
+                  to="/roomsexplore"
                   onClick={() => setDrawerOpen(false)}
                 >
                   <ListItemText primary="Explore" />

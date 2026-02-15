@@ -27,14 +27,12 @@ export default function Fav() {
 
   useEffect(() => {
     getFavsList();
-    console.log("hh" + favList);
+    
   }, []);
-  useEffect(() => {
-    console.log("favList updated 👉", favList);
-  }, [favList]);
+ 
   return (
     <>
-      <Box sx={{ width: "80%", margin: "auto" }}>
+      <Box sx={{ width: "85%", margin: "auto" }}>
         <Breadcrumbs sx={{ fontWeight: "500", mt: 2 }} aria-label="breadcrumb">
           <MUILink
             underline="none"
@@ -62,22 +60,28 @@ export default function Fav() {
           Your Favorites
         </Typography>
       </Box>
-      <Box sx={{ width: "80%", margin: "auto" }}>
-        <Grid
-          container
+     <Box sx={{ width: "85%", margin: "auto" }}>
+            <Grid
+          // container
+           sx={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+    gap: "20px",
+    padding: "10px",
+    overflow: "visible"
+  }}
           spacing={{ xs: 2, md: 3 }}
-          columns={{ xs: 4, sm: 8, md: 12 }}
         >
           {favList.map((room) => (
-            <Box key={room._id}>
+            <Grid  key={room._id} room={room} >
               <ImageCard
-                // onClick={() => navigate(`${ROOM_DETAILS_PATH}/${room._id}`)}
+                onClick={() => navigate(`roomsexplore/${room._id}`)}
                 roomId={room._id}
                 image={room.images?.[0]}
                 title={room.roomNumber}
                 price={room.price}
                 isFirst={false}
-                gridStyles={{ width: "100%", height: 250 }}
+                gridStyles={{ width: "100%", height: 220 }}
                 // isFavorite={favoriteIds.includes(room._id)}
                 // onToggleFavorite={(id) => {
                 //   if (favoriteIds.includes(id)) {
@@ -87,10 +91,11 @@ export default function Fav() {
                 //   }
                 // }}
               />
-            </Box>
+            </Grid>
           ))}
         </Grid>
-      </Box>
+     </Box>
+
     </>
   );
 }
