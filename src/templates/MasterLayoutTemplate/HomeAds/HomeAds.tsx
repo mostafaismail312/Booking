@@ -9,6 +9,10 @@ import { Navigate, useNavigate } from "react-router-dom";
 import ImageCard from "./ImageCard";
 import { useFavorite } from "../../../context/FavoriteContext/FavoriteContext";
 import toast from "react-hot-toast";
+import defaultImage from "../../../assets/images/bghvd1mamgpjnewgd2rt.png";
+import defaultImage1 from "../../../assets/images/hv3kpulmpyzb2mgtsx85.png";
+import defaultImage2 from "../../../assets/images/upegcd2svrx5neo5kvri.png"
+
 
 export default function HomeAds() {
   const [adsData, setAdsData] = useState<[]>([]);
@@ -126,13 +130,13 @@ export default function HomeAds() {
             1280: { slidesPerView: 4 },
           }}
         >
-          {adsData.map((ad) => {
+          {[...adsData].reverse().map((ad) => {
             const room = ad.room;
             return (
               <SwiperSlide key={room._id}>
                 <ImageCard
                   roomId={room._id}
-                  image={room.images?.[0]}
+                  image={room.images?.[0] || defaultImage}
                   title={""}
                   price={room.price}
                   isFirst={false}
@@ -202,7 +206,7 @@ export default function HomeAds() {
               <SwiperSlide key={room._id}>
                 <ImageCard
                   roomId={room._id}
-                  image={room.images?.[0]}
+                  image={room.images?.[0] || defaultImage2}
                   title={""}
                   price={room.price}
                   isFirst={false}
@@ -267,13 +271,13 @@ export default function HomeAds() {
             1280: { slidesPerView: 4 },
           }}
         >
-          {adsData.map((ad) => {
+          {[...adsData].reverse().map((ad) => {
             const room = ad.room;
             return (
               <SwiperSlide key={room._id}>
                 <ImageCard
                   roomId={room._id}
-                  image={room.images?.[0]}
+                  image={room.images?.[0] || defaultImage1 }
                   title={""}
                   price={room.price}
                   isFirst={false}

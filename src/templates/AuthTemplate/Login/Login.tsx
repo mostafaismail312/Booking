@@ -171,7 +171,7 @@ export default function Login() {
                     }
                     {...register(
                       "password",
-                      // validation.PASSWORD_VALIDATION("your password is requird")
+                      validation.PASSWORD_VALIDATION("your password is requird")
                     )}
                   />
                 </FormControl>

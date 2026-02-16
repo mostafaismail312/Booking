@@ -342,8 +342,6 @@ const Navbar = () => {
 
                   component={RouterLink}
                   to="/roomsexplore"
-                  onClick={() => setDrawerOpen(false)}
-
                   sx={drawerItemSx}
                   onClick={() => {
                     navigate("/roomsexplore");

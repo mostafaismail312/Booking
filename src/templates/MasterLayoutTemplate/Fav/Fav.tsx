@@ -12,7 +12,7 @@ import { MAIN_PATH } from "../../../services/paths";
 import { FAV_LIST_PATH } from "./../../../services/paths";
 import { useFavorite } from "../../../context/FavoriteContext/FavoriteContext";
 import { useEffect } from "react";
-
+import defaultImage from "../../../assets/images/defaultroom.png";
 export default function Fav() {
   const navigate = useNavigate();
   const {
@@ -77,19 +77,19 @@ export default function Fav() {
               <ImageCard
                 onClick={() => navigate(`roomsexplore/${room._id}`)}
                 roomId={room._id}
-                image={room.images?.[0]}
+               image={room.images?.[0] || defaultImage}
                 title={room.roomNumber}
                 price={room.price}
                 isFirst={false}
                 gridStyles={{ width: "100%", height: 220 }}
-                // isFavorite={favoriteIds.includes(room._id)}
-                // onToggleFavorite={(id) => {
-                //   if (favoriteIds.includes(id)) {
-                //     deleteFromFavs(id);
-                //   } else {
-                //     addToFavs(id);
-                //   }
-                // }}
+                isFavorite={favoriteIds.includes(room._id)}
+                onToggleFavorite={(id) => {
+                  if (favoriteIds.includes(id)) {
+                    deleteFromFavs(id);
+                  } else {
+                    addToFavs(id);
+                  }
+                }}
               />
             </Grid>
           ))}
