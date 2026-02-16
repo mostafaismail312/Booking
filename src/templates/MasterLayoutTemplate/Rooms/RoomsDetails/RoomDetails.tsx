@@ -150,7 +150,7 @@ export default function RoomDetails() {
     };
   }, []);
 
-  // ✅ Placeholder replace if no image or failed to load
+
   const PLACEHOLDER = "/forget.jpg";
 
   const imgSrc = (u?: string) => {
@@ -160,7 +160,7 @@ export default function RoomDetails() {
 
   const handleImgError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const el = e.currentTarget;
-    if (el.src.includes(PLACEHOLDER)) return; // avoid loop
+    if (el.src.includes(PLACEHOLDER)) return; 
     el.src = PLACEHOLDER;
   };
 
@@ -276,18 +276,17 @@ export default function RoomDetails() {
     try {
       if (!id) return alert("Room id is missing");
       if (!bookingRange[0] || !bookingRange[1])
-        return alert("اختاري تاريخ البداية والنهاية");
+        return alert("choose start date and end date");
 
       const t = getRawToken();
-      if (!t) return alert("token is required - اعملي login تاني");
+      if (!t) return alert("token is required - please login");
 
       setIsBooking(true);
 
-      // ✅ FIX: remove roomId entirely (backend rejects it)
       const createPayload = {
         startDate: bookingRange[0].toDate().toISOString(),
         endDate: bookingRange[1].toDate().toISOString(),
-        room: id, // ✅ only allowed key
+        room: id, 
         totalPrice: Number(totalPrice),
       };
 
