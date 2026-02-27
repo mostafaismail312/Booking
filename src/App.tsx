@@ -1,21 +1,37 @@
+import "./App.css";
+import AuthLayout from "./layouts/AuthLayout/AuthLayout";
+import NotFound from "./shared/NotFound/NotFound";
+import Login from "./templates/AuthTemplate/Login/Login";
+import Register from "./templates/AuthTemplate/Register/Register";
+import ForgetPass from "./templates/AuthTemplate/ForgetPass/ForgetPass";
+import ResetPass from "./templates/AuthTemplate/ResetPass/ResetPass";
+import VerifyAccount from "./templates/AuthTemplate/VerifyAccount/VerifyAccount";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import PATHS from "./services/paths";
+import ChangePassword from "./templates/AuthTemplate/ChangePassword/ChangePassword";
+import MasterLayout from "./shared/MasterLayout/MasterLayout";
+import { Dashboard } from "@mui/icons-material";
+import RoomList from "./templates/DashboardTemplate/Rooms/RoomList/RoomList";
+import CreateRoom from "./templates/DashboardTemplate/Rooms/CreateRoom/CreateRoom";
+import Users from "./templates/DashboardTemplate/Users/Users";
+import Home from "./templates/DashboardTemplate/Home/Home";
+import FacilitiesList from "./templates/DashboardTemplate/Facilities/FacilitiesList/FacilitiesList";
+import FacilityData from "./templates/DashboardTemplate/Facilities/FacilityData/FacilityData";
+import AdsList from "./templates/DashboardTemplate/ADS/AdsList/AdsList";
+import CreateAds from "./templates/DashboardTemplate/ADS/CreateAds/CreateAds";
+import ProtectedRoute from "./context/ProtectedRoute";
+import RoomsExplore from "./templates/MasterLayoutTemplate/Rooms/RoomsExplore/RoomsExplore";
+import RoomDetails from "./templates/MasterLayoutTemplate/Rooms/RoomsDetails/RoomDetails";
+import LandingPage from "./shared/LandingPage/LandingPage";
+import MainLayout from "./shared/MainLayout/MainLayout";
+import Fav from "./templates/MasterLayoutTemplate/Fav/Fav";
+import MostPopulardetails from "./templates/MasterLayoutTemplate/MostPopular/MostPopulardetails";
+import Checkout from "./templates/MasterLayoutTemplate/Rooms/RoomsDetails/Checkout";
+import BookingList from "./templates/DashboardTemplate/Bookings/BookingList/BookingList";
 
-import './App.css'
-import AuthLayout from './layouts/AuthLayout/AuthLayout'
-import NotFound from './shared/NotFound/NotFound'
-import Login from './templates/AuthTemplate/Login/Login'
-import Register from './templates/AuthTemplate/Register/Register'
-import ForgetPass from './templates/AuthTemplate/ForgetPass/ForgetPass'
-import ResetPass from './templates/AuthTemplate/ResetPass/ResetPass'
-import VerifyAccount from './templates/AuthTemplate/VerifyAccount/VerifyAccount'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import PATHS from './services/paths'
-import ChangePassword from './templates/AuthTemplate/ChangePassword/ChangePassword'
 
 function App() {
-
-
-    
-   const routes = createBrowserRouter([
+  const routes = createBrowserRouter([
     // Auth Routes
     {
       path: "",
@@ -36,23 +52,75 @@ function App() {
           path: PATHS.VERIFY_ACCOUNT_PATH,
           element: <VerifyAccount />,
         },
-           {
-          path: PATHS.CHANGE_PASS_PATH,
+        {
+          path: "change-password",
+
           element: <ChangePassword />,
         },
-      ]
+      ],
     },
 
-   ] 
-  );
+    {
+      path: PATHS.DASHBOARD_PATH,
+      element: (
+        <ProtectedRoute allowedRoles={["admin"]}>
+          {" "}
+          <MasterLayout />
+        </ProtectedRoute>
+      ),
+      errorElement: <NotFound />,
+      children: [
+        { index: true, element: <Home /> },
+        { path: "home", element: <Home /> },
+        { path: "rooms", element: <RoomList /> },
+         { path: "bookings", element: <BookingList/> },
+
+        { path: "createroom", element: <CreateRoom /> },
+        { path: "edit/:id", element: <CreateRoom /> },
+        { path: "users", element: <Users /> },
+        {
+          path: "facilities-list",
+          element: <FacilitiesList />,
+        },
+        {
+          path: PATHS.FACILITY_DATA_PATH,
+          element: <FacilityData />,
+        },
+        {
+          path: PATHS.ADS_LIST_PATH,
+          element: <AdsList />,
+        },
+        { path: "createads", element: <CreateAds /> },
+        { path: "editads/:id", element: <CreateAds /> },
+      ],
+    },
+
+    {
+      path: PATHS.MAIN_PATH, // "/"
+      errorElement: <NotFound />,
+      element: <MainLayout />,
+      children: [
+        { index: true, element: <LandingPage /> },
+        { path: "landing-page", element: <LandingPage /> },
+
+       { path: "rooms", element: <RoomsExplore /> },
+
+        { path: "room-details/:id", element: <RoomDetails /> },
+        { path: "roomsexplore", element: <RoomsExplore /> },
+        { path: "fav-list", element: <Fav /> },
+          { path: "checkout/:bookingId", element: <Checkout /> },
+         { path: "most-popular-details/:id", element: <MostPopulardetails /> },
+      
+
+      ],
+    },
+  ]);
 
   return (
     <>
-   <RouterProvider router={routes}></RouterProvider>
+      <RouterProvider router={routes}></RouterProvider>
     </>
   );
- 
-  
 }
 
-export default App
+export default App;

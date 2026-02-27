@@ -48,22 +48,20 @@ export const ADMIN_URLS = {
 
   // Booking Management Endpoints within Admin
   BOOKING: {
-    // Path to create a new booking (admin can create bookings)
-    CREATE_BOOKING: "/admin/Booking",
-    // Path to get details of a specific booking by its ID (admin view)
+     CREATE_BOOKING: `${baseURL}/admin/booking`,
     GET_BOOKING: (id: string): string => `${baseURL}/admin/booking/${id}`,
+    DELETE_BOOKING: (id: string) => `${baseURL}/admin/booking/${id}`,
+    GET_ALL_BOOKINGS: `${baseURL}/admin/booking`,
+
     // Path to update details of a specific booking by its ID (admin view)
     UPDATE_BOOKING: (id: number): string => `${baseURL}/admin/Booking/${id}`,
     // Path to cancel a specific booking by its ID (admin view)
     CANCEL_BOOKING: (id: number): string =>
-      `${baseURL}/admin/Booking/${id}/cancel`,
-    // Path to delete a specific booking by its ID (admin view)
-    DELETE_BOOKING: (id: string) => `${baseURL}/admin/booking/${id}`,
-    // Path to get all bookings (admin view, with filtering/pagination)
-    GET_ALL_BOOKINGS: "/admin/Booking",
+      `${baseURL}/admin/booking/${id}/cancel`,
+  
     // Path to confirm a specific booking (admin action)
     CONFIRM_BOOKING: (id: number): string =>
-      `${baseURL}/admin/Booking/${id}/confirm`,
+      `${baseURL}/admin/booking/${id}/confirm`,
   },
 
   // Ads Management Endpoints within Admin
@@ -78,6 +76,7 @@ export const ADMIN_URLS = {
     DELETE_AD: (id: string): string => `${baseURL}/admin/Ads/${id}`,
     // Path to get all ads (admin view, with filtering/pagination)
     GET_ALL_ADS: `${baseURL}/admin/Ads`,
+    
   },
 
   // Dashboard Endpoints within Admin
@@ -105,7 +104,8 @@ export const PORTAL_URLS = {
     // Path for Facebook OAuth login
     FACEBOOK_AUTH: `${baseURL}/portal/facebook-auth`, // As seen in Postman screenshot
     // Path to get current user profile for portal users
-    GET_USER_PROFILE: `${baseURL}/portal/users/currentUser`, // Assuming a dedicated endpoint for portal
+        GET_USER_PROFILE: (id: string) => `${baseURL}/portal/users/${id}`,
+     // Assuming a dedicated endpoint for portal
     // Path to update current user profile for portal users
     UPDATE_PROFILE: `${baseURL}/portal/users`,
     // Path to change password for portal users
@@ -153,18 +153,14 @@ export const PORTAL_URLS = {
   },
 
   // Booking Endpoints within Portal
-  BOOKING: {
-    // Path to create a new booking by a portal user
-    CREATE_BOOKING: `${baseURL}/portal/Booking`,
-    // Path to get details of a specific booking by its ID for a portal user
-    GET_BOOKING: (id: string) => `${baseURL}/portal/Booking/${id}`,
-    // Path to update details of a specific booking by its ID for a portal user
-    UPDATE_BOOKING: (id: string) => `${baseURL}/portal/Booking/${id}`,
-    // Path to cancel a specific booking by its ID for a portal user
-    CANCEL_BOOKING: (id: string) => `${baseURL}/portal/Booking/${id}/cancel`,
-    // Path to get all bookings for the current portal user
-    GET_MY_BOOKINGS: `${baseURL}/portal/Booking/my-bookings`, // Assuming a dedicated endpoint for user's own bookings
-  },
+BOOKING: {
+  CREATE_BOOKING: `${baseURL}/portal/booking`,
+  GET_BOOKING: (id: string) => `${baseURL}/portal/booking/${id}`,
+  UPDATE_BOOKING: (id: string) => `${baseURL}/portal/booking/${id}`,
+  CANCEL_BOOKING: (id: string) => `${baseURL}/portal/booking/${id}/cancel`,
+  GET_MY_BOOKINGS: `${baseURL}/portal/booking/my-bookings`,
+  PAY: (id: string) => `${baseURL}/portal/booking/${id}/pay`,
+},
 
   // Ads Endpoints within Portal (if applicable for users to view)
   ADS: {
