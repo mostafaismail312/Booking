@@ -39,14 +39,6 @@ export default function ChangePassword() {
       const response = await axiosInstance.post(ADMIN_URLS.USER.CHANGE_PASSWORD, data);
     
       console.log("ana", response.data.data);
-
-      if (response?.data.data?.user.role != "user") {
-        navigate(DASHBOARD_PATH);
-      } else {
-        navigate("/");
-      }
-
-   
       toast.success("Login success!");
     } catch (error) {
       if (isAxiosError(error)) {
