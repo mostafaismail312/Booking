@@ -8,11 +8,11 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../../services/axiosInstance";
-import { ADMIN_URLS } from "../../../services/apiEndpoints";
+import { ADMIN_URLS, PORTAL_URLS } from "../../../services/apiEndpoints";
 import { isAxiosError } from "axios";
 import toast from "react-hot-toast";
 import Logo from "../../../components/AuthComponents/Logo/Logo";
-import { DASHBOARD_PATH, FORGET_PASS_PATH } from "../../../services/paths";
+import { DASHBOARD_PATH, FORGET_PASS_PATH, LOGIN_PATH } from "../../../services/paths";
 import validation from "../../../services/validation";
 import SubmitBtn from "../../../layouts/AuthLayout/submitBtn";
 import type { LoginProps, ResetPasswordProps } from "../../../interfaces/Auth";
@@ -42,20 +42,12 @@ export default function ResetPass() {
 
   const onSubmit = async (data: ResetPasswordProps) => {
     try {
-      const response = await axiosInstance.post(ADMIN_URLS.USER.RESET_PASSWORD, data);
+      const response = await axiosInstance.post(PORTAL_URLS.USER.RESET_PASSWORD, data);
      
       console.log("ana", response.data.data);
-
-      if (response?.data.data?.user.role != "user") {
-        navigate(DASHBOARD_PATH);
-      } else {
-        navigate("/");
-      }
-
-      //saveLoginData();
-      // await saveLoginData();
-      // await getCurrentUser();
-      toast.success("Login success!");
+      navigate(LOGIN_PATH)
+      toast.success(" success!");
+      navigate(LOGIN_PATH)
     } catch (error) {
       // console.log(error?.response?.data?.message);
       if (isAxiosError(error)) {
